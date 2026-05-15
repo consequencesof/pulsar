@@ -2,282 +2,277 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Pulsar Messenger</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Pulsar — космический мессенджер</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     :root {
-      --bg-main: #09070f;
-      --bg-soft: #141022;
-      --glass: rgba(24, 14, 44, 0.42);
-      --text-main: #f4efff;
-      --text-muted: #b8a9d7;
-      --accent: #9a6bff;
-      --border-glow: rgba(255, 255, 255, 0.1);
+      --bg-dark: #0a0a0f;
+      --bg-card: #141122;
+      --glass-bg: rgba(20, 17, 34, 0.7);
+      --accent: #8b5cf6;
+      --accent-glow: #a78bfa;
+      --text: #f0f0ff;
+      --text-muted: #a0a0c0;
+      --border: rgba(139, 92, 246, 0.2);
     }
-    [data-theme="aurora"] { --bg-main: #09070f; --bg-soft: #171127; --glass: rgba(179, 140, 255, 0.13); --text-main: #f4efff; --text-muted: #bba9df; --accent: #9a6bff; }
-    [data-theme="dusk"] { --bg-main: #07060d; --bg-soft: #120f1e; --glass: rgba(172, 125, 255, 0.11); --text-main: #f8efff; --text-muted: #c8b5e8; --accent: #b07cff; }
-    [data-theme="ember"] { --bg-main: #050409; --bg-soft: #110d19; --glass: rgba(164, 116, 255, 0.12); --text-main: #f5ebff; --text-muted: #c3aedf; --accent: #8552ff; }
+    
+    [data-theme="aurora"] { --accent: #8b5cf6; --accent-glow: #a78bfa; --bg-card: #141122; }
+    [data-theme="dusk"] { --accent: #f59e0b; --accent-glow: #fbbf24; --bg-card: #1a1a2e; }
+    [data-theme="ember"] { --accent: #ef4444; --accent-glow: #f87171; --bg-card: #2d1a1a; }
     
     body {
-      background: radial-gradient(circle at 14% 9%, rgba(156, 106, 255, 0.24) 0%, transparent 40%),
-                  radial-gradient(circle at 88% 8%, rgba(114, 74, 214, 0.28) 0%, transparent 40%),
-                  linear-gradient(145deg, #040307 0%, #090711 48%, #130a22 100%);
-      color: var(--text-main);
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a0f2e 50%, #0a0a0f 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
       min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      transition: background 0.2s ease;
     }
     
-    body.liquid-glass .glass,
-    body.liquid-glass .glass-auth,
-    body.liquid-glass .sidebar-dark,
-    body.liquid-glass main.glass {
-      backdrop-filter: blur(24px) !important;
-      background: rgba(255, 255, 255, 0.08) !important;
-      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    body.liquid-glass .glass-card {
+      backdrop-filter: blur(20px);
+      background: rgba(20, 17, 34, 0.4);
+      border: 1px solid rgba(139, 92, 246, 0.3);
     }
     
-    .glass {
-      background: var(--glass);
-      backdrop-filter: blur(18px);
-      border: 1px solid var(--border-glow);
-    }
-    .glass-auth {
-      background: linear-gradient(140deg, rgba(44, 28, 76, 0.68), rgba(18, 12, 34, 0.5));
-      backdrop-filter: blur(26px);
-      border: 1px solid rgba(199, 167, 255, 0.24);
-      border-radius: 1.5rem;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.38);
-    }
-    .sidebar-dark {
-      background: radial-gradient(circle at 11% 8%, rgba(151, 105, 255, 0.16) 0%, transparent 36%),
-                  radial-gradient(circle at 89% 7%, rgba(111, 72, 215, 0.22) 0%, transparent 38%),
-                  linear-gradient(160deg, rgba(7, 6, 11, 0.95), rgba(22, 14, 39, 0.92));
-      border-color: rgba(255, 255, 255, 0.12);
-      border-radius: 1.5rem;
-    }
-    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
-    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-    .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-    .pulse-dot { animation: pulse-dot 2.2s infinite; }
-    @keyframes pulse-dot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.25); opacity: 0.5; } }
-    
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 28px;
+      border: 1px solid var(--border);
     }
     
-    @keyframes messageAppear {
-      from { opacity: 0; transform: scale(0.95) translateY(10px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+    .gradient-text {
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     
-    .message-enter {
-      animation: messageAppear 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+    .message-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 20px;
+      word-break: break-word;
+      animation: fadeSlideUp 0.25s ease-out;
     }
     
-    .btn-primary {
-      background: var(--accent);
-      color: #09101f;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .btn-primary:hover { opacity: 0.85; }
-    .btn-primary:active { transform: scale(0.98); }
-    .btn-secondary {
-      background: rgba(255,255,255,0.1);
-      cursor: pointer;
-      transition: background 0.15s;
+    
+    .chat-item {
+      transition: all 0.2s ease;
+      border-radius: 16px;
     }
-    .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+    .chat-item:hover { background: rgba(139, 92, 246, 0.15); transform: translateX(4px); }
+    .chat-item-active { background: rgba(139, 92, 246, 0.25); }
     
     .snow-flake {
       position: fixed;
       pointer-events: none;
       background: white;
       border-radius: 50%;
-      opacity: 0.7;
+      opacity: 0.6;
       z-index: 9999;
+      animation: fall linear forwards;
     }
     
     @keyframes fall {
-      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.7; }
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.6; }
       100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
     
-    .cursor-pointer { cursor: pointer; }
-    .transition-all { transition: all 0.15s ease; }
-    .hidden { display: none; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
     
-    .chat-item-active {
-      background: rgba(255,255,255,0.15);
+    button { cursor: pointer; transition: all 0.15s ease; }
+    button:active { transform: scale(0.97); }
+    
+    input, textarea, select {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 12px 16px;
+      color: var(--text);
+      outline: none;
+      transition: all 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
     }
   </style>
 </head>
 <body data-theme="aurora">
-  <div id="snowContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 9999; overflow: hidden;"></div>
+  <div id="snowContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 9999;"></div>
 
-  <!-- Экран авторизации -->
+  <!-- АВТОРИЗАЦИЯ -->
   <div id="authView" class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-5xl grid md:grid-cols-2 gap-4 md:gap-6">
-      <section class="glass glass-auth rounded-3xl p-8 flex flex-col justify-between min-h-[540px] relative overflow-hidden">
-        <div class="absolute -top-28 -right-20 w-72 h-72 rounded-full opacity-35 blur-3xl" style="background: var(--accent); animation: spin 20s linear infinite;"></div>
-        <div class="relative z-10">
-          <h1 class="text-4xl md:text-5xl font-semibold tracking-tight bg-gradient-to-r from-white to-[color:var(--accent)] bg-clip-text text-transparent">Pulsar</h1>
-          <p class="mt-4 text-[color:var(--text-muted)] text-lg">Мессенджер с реальной синхронизацией</p>
+    <div class="w-full max-w-5xl grid md:grid-cols-2 gap-5">
+      <div class="glass-card p-8 flex flex-col justify-between min-h-[500px]">
+        <div>
+          <h1 class="text-5xl font-bold gradient-text">Pulsar</h1>
+          <p class="mt-4 text-gray-300 text-lg">Мессенджер в реальном времени с космическим стилем</p>
         </div>
-      </section>
-      <section class="glass glass-auth rounded-3xl p-6 md:p-8 min-h-[540px]">
-        <div class="flex gap-2 mb-6">
-          <button id="loginTab" class="px-4 py-2 rounded-full bg-white/15 cursor-pointer transition-all">Вход</button>
-          <button id="registerTab" class="px-4 py-2 rounded-full cursor-pointer transition-all">Регистрация</button>
+        <div class="mt-8">
+          <div class="w-16 h-16 rounded-full bg-[var(--accent)]/20 flex items-center justify-center">
+            <span class="text-3xl">✨</span>
+          </div>
+        </div>
+      </div>
+      <div class="glass-card p-6">
+        <div class="flex gap-2 mb-5">
+          <button id="loginTab" class="flex-1 py-2 rounded-full bg-white/10 font-medium">Вход</button>
+          <button id="registerTab" class="flex-1 py-2 rounded-full font-medium">Регистрация</button>
         </div>
         <form id="loginForm" class="space-y-4">
-          <input id="loginUsername" class="w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none focus:border-[color:var(--accent)] transition-all" placeholder="@username" />
-          <input id="loginPassword" type="password" class="w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none" placeholder="Пароль" />
-          <button type="submit" class="btn-primary w-full py-3 rounded-xl">Войти</button>
+          <input id="loginUsername" placeholder="@username" class="w-full" />
+          <input id="loginPassword" type="password" placeholder="Пароль" class="w-full" />
+          <button type="submit" class="w-full py-3 rounded-full font-semibold" style="background: var(--accent); color: white;">Войти</button>
         </form>
         <form id="registerForm" class="space-y-4 hidden">
-          <input id="regUsername" class="w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none" placeholder="@username" />
-          <input id="regNickname" class="w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none" placeholder="Nickname" />
-          <input id="regPassword" type="password" class="w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none" placeholder="Пароль" />
-          <button type="submit" class="btn-primary w-full py-3 rounded-xl">Создать аккаунт</button>
+          <input id="regUsername" placeholder="@username" class="w-full" />
+          <input id="regNickname" placeholder="Nickname" class="w-full" />
+          <input id="regPassword" type="password" placeholder="Пароль" class="w-full" />
+          <button type="submit" class="w-full py-3 rounded-full font-semibold" style="background: var(--accent); color: white;">Создать</button>
         </form>
-        <div class="mt-4 flex gap-2">
-          <button id="diagnosticBtn" class="text-sm text-[color:var(--text-muted)] hover:text-white underline cursor-pointer">Диагностика</button>
-        </div>
-        <p id="authError" class="mt-4 text-sm text-red-300"></p>
-      </section>
+        <button id="diagnosticBtn" class="mt-4 text-sm text-gray-400 underline w-full">Диагностика</button>
+        <p id="authError" class="mt-3 text-sm text-red-400 text-center"></p>
+      </div>
     </div>
   </div>
 
-  <!-- Модалка просмотра профиля -->
-  <div id="profileModal" class="hidden fixed inset-0 bg-black/45 backdrop-blur-sm items-center justify-center p-4 z-40" style="display: none;">
-    <div class="glass rounded-3xl w-full max-w-md p-6 text-center fade-in">
-      <img id="profileAvatar" class="w-24 h-24 rounded-full mx-auto object-cover border-3 border-[color:var(--accent)]" src="" />
+  <!-- ПРОФИЛЬ (модалка) -->
+  <div id="profileModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="glass-card w-full max-w-md p-6 text-center">
+      <img id="profileAvatar" class="w-24 h-24 rounded-full mx-auto object-cover border-3" style="border-color: var(--accent);" src="" />
       <h3 id="profileNick" class="text-xl font-bold mt-3"></h3>
-      <p id="profileUsername" class="text-[color:var(--text-muted)] text-sm mt-1"></p>
+      <p id="profileUsername" class="text-gray-400 text-sm mt-1"></p>
       <div id="profileNftBlock" class="mt-3 p-3 rounded-xl bg-white/5 hidden">
-        <p class="text-xs text-[color:var(--text-muted)]">А также</p>
-        <p id="profileNft" class="text-[color:var(--accent)] font-mono"></p>
+        <p class="text-xs text-gray-400">А также</p>
+        <p id="profileNft" class="text-[var(--accent)] font-mono"></p>
       </div>
       <div id="profileAnonBlock" class="mt-2 p-3 rounded-xl bg-white/5 hidden">
-        <p class="text-xs text-[color:var(--text-muted)]">Анонимный номер</p>
+        <p class="text-xs text-gray-400">Анонимный номер</p>
         <p id="profileAnon" class="font-mono"></p>
       </div>
-      <button id="closeProfile" class="mt-5 w-full py-2 rounded-xl btn-secondary">Закрыть</button>
+      <button id="closeProfile" class="mt-5 w-full py-2 rounded-xl bg-white/10">Закрыть</button>
     </div>
   </div>
 
-  <!-- Модалка редактирования профиля -->
-  <div id="editProfileModal" class="hidden fixed inset-0 bg-black/45 backdrop-blur-sm items-center justify-center p-4 z-40" style="display: none;">
-    <div class="glass rounded-3xl w-full max-w-md p-6 fade-in">
-      <h3 class="text-xl font-semibold mb-4 text-center">Редактировать профиль</h3>
+  <!-- РЕДАКТИРОВАНИЕ ПРОФИЛЯ -->
+  <div id="editProfileModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="glass-card w-full max-w-md p-6">
+      <h3 class="text-xl font-semibold text-center mb-4">Редактировать</h3>
       <div class="text-center mb-4">
-        <img id="editAvatarPreview" class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-[color:var(--accent)]" src="" />
+        <img id="editAvatarPreview" class="w-20 h-20 rounded-full mx-auto object-cover border-2" style="border-color: var(--accent);" src="" />
         <input type="file" id="avatarFile" accept="image/*" class="mt-2 text-sm" />
       </div>
-      <input id="editNickname" class="w-full rounded-xl bg-black/30 border border-white/15 px-3 py-2 mb-3 outline-none focus:border-[color:var(--accent)]" placeholder="Nickname" />
-      <input id="editUsername" class="w-full rounded-xl bg-black/30 border border-white/15 px-3 py-2 mb-3 outline-none focus:border-[color:var(--accent)]" placeholder="@username" />
-      <button id="saveProfileBtn" class="btn-primary w-full py-2 rounded-xl">Сохранить</button>
-      <button id="closeEditProfile" class="btn-secondary w-full py-2 rounded-xl mt-2">Отмена</button>
+      <input id="editNickname" placeholder="Nickname" class="w-full mb-3" />
+      <input id="editUsername" placeholder="@username" class="w-full mb-3" />
+      <button id="saveProfileBtn" class="w-full py-2 rounded-xl font-semibold mb-2" style="background: var(--accent);">Сохранить</button>
+      <button id="closeEditProfile" class="w-full py-2 rounded-xl bg-white/10">Отмена</button>
     </div>
   </div>
 
-  <!-- Модалка удаления чата -->
-  <div id="deleteChatModal" class="hidden fixed inset-0 bg-black/45 backdrop-blur-sm items-center justify-center p-4 z-45" style="display: none;">
-    <div class="glass rounded-3xl w-full max-w-sm p-6 fade-in">
-      <h3 class="text-xl font-semibold mb-3 text-center">Удалить чат</h3>
-      <p class="text-center text-sm mb-4">Выберите действие:</p>
-      <button id="deleteForMeBtn" class="btn-secondary w-full py-2 rounded-xl mb-2">🗑️ Удалить только у меня</button>
-      <button id="deleteForBothBtn" class="btn-secondary w-full py-2 rounded-xl mb-2">⚠️ Удалить у всех</button>
-      <button id="cancelDeleteBtn" class="btn-primary w-full py-2 rounded-xl mt-2">Отмена</button>
+  <!-- УДАЛЕНИЕ ЧАТА -->
+  <div id="deleteChatModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="glass-card w-full max-w-sm p-6 text-center">
+      <h3 class="text-xl font-semibold mb-3">Удалить чат?</h3>
+      <button id="deleteForMeBtn" class="w-full py-2 rounded-xl bg-white/10 mb-2">🗑️ Только у меня</button>
+      <button id="deleteForBothBtn" class="w-full py-2 rounded-xl bg-red-500/20 mb-2 text-red-400">⚠️ У всех</button>
+      <button id="cancelDeleteBtn" class="w-full py-2 rounded-xl" style="background: var(--accent);">Отмена</button>
     </div>
   </div>
 
-  <!-- Главное приложение -->
-  <div id="appView" class="hidden h-screen p-3 md:p-4">
-    <div class="h-full grid md:grid-cols-[340px_1fr] gap-3 md:gap-4">
-      <aside class="glass sidebar-dark rounded-3xl p-4 flex flex-col min-h-0">
+  <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+  <div id="appView" class="hidden h-screen p-3">
+    <div class="h-full grid md:grid-cols-[320px_1fr] gap-3">
+      <!-- Боковая панель -->
+      <div class="glass-card p-4 flex flex-col min-h-0">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3 cursor-pointer" id="myProfileBtn">
-            <img id="myAvatar" class="w-10 h-10 rounded-full object-cover border border-[color:var(--accent)]" src="" />
+            <img id="myAvatar" class="w-12 h-12 rounded-full object-cover border-2" style="border-color: var(--accent);" src="" />
             <div>
-              <h2 class="text-2xl font-semibold bg-gradient-to-r from-white to-[color:var(--accent)] bg-clip-text text-transparent">Pulsar</h2>
-              <p id="myUsernameLabel" class="text-sm text-[color:var(--text-muted)]"></p>
+              <h2 class="text-xl font-bold gradient-text">Pulsar</h2>
+              <p id="myUsernameLabel" class="text-sm text-gray-400"></p>
             </div>
           </div>
-          <button id="openSettings" class="btn-secondary px-3 py-1.5 rounded-lg text-xl">⚙️</button>
+          <button id="openSettings" class="w-10 h-10 rounded-full bg-white/10 text-xl">⚙️</button>
         </div>
-        <label class="block mb-3"><span class="text-xs text-[color:var(--text-muted)]">Поиск @username</span><div class="flex gap-2 mt-1"><input id="searchInput" class="flex-1 rounded-xl bg-black/25 border border-white/15 px-3 py-2 outline-none focus:border-[color:var(--accent)]" placeholder="@username" /><button id="searchBtn" class="btn-secondary px-3 py-2 rounded-xl">🔍</button></div></label>
+        
+        <div class="flex gap-2 mb-3">
+          <input id="searchInput" placeholder="Поиск @username" class="flex-1" />
+          <button id="searchBtn" class="px-4 rounded-full bg-white/10">🔍</button>
+        </div>
         <div id="searchResult" class="text-sm mb-3"></div>
-        <p class="text-xs uppercase mb-2 text-[color:var(--text-muted)]">Чаты</p>
-        <div id="chatList" class="flex-1 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin"></div>
-        <button id="logoutBtn" class="mt-3 py-2 rounded-xl btn-secondary">Выйти</button>
-      </aside>
-      <main class="glass rounded-3xl flex flex-col min-h-0">
-        <div class="px-5 py-3 border-b border-white/10 flex items-center justify-between">
+        
+        <p class="text-xs text-gray-400 mb-2">📩 ЧАТЫ</p>
+        <div id="chatList" class="flex-1 overflow-y-auto space-y-1 pr-1"></div>
+        
+        <button id="logoutBtn" class="mt-3 py-2 rounded-xl bg-white/10">🚪 Выйти</button>
+      </div>
+      
+      <!-- Чат -->
+      <div class="glass-card flex flex-col min-h-0">
+        <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
           <div>
-            <h3 id="chatTitle" class="font-semibold">Нет диалога</h3>
-            <p id="chatStatus" class="text-xs text-[color:var(--text-muted)]"></p>
+            <h3 id="chatTitle" class="font-semibold text-lg">Нет диалога</h3>
+            <p id="chatStatus" class="text-xs text-gray-400"></p>
           </div>
-          <button id="deleteChatBtn" class="btn-secondary px-3 py-1.5 rounded-lg text-sm hidden">🗑️</button>
+          <button id="deleteChatBtn" class="w-10 h-10 rounded-full bg-white/10 hidden">🗑️</button>
         </div>
-        <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin"></div>
+        
+        <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+        
         <form id="messageForm" class="p-3 border-t border-white/10 flex gap-2">
-          <input id="messageInput" class="flex-1 rounded-xl bg-black/25 border border-white/15 px-4 py-2 outline-none focus:border-[color:var(--accent)]" placeholder="Сообщение..." />
-          <button class="btn-primary px-5 rounded-xl">➤</button>
+          <input id="messageInput" placeholder="Сообщение..." class="flex-1" />
+          <button class="px-5 rounded-full font-bold" style="background: var(--accent);">➤</button>
         </form>
-      </main>
+      </div>
     </div>
   </div>
 
-  <!-- Настройки -->
-  <div id="settingsModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm items-center justify-center p-4 z-30" style="display: none;">
-    <div class="glass rounded-3xl w-full max-w-xl p-6 max-h-[90vh] overflow-y-auto fade-in">
-      <div class="flex justify-between mb-4"><h3 class="text-2xl font-semibold">Настройки</h3><button id="closeSettings" class="btn-secondary px-3 py-1 rounded-lg">✕</button></div>
+  <!-- НАСТРОЙКИ -->
+  <div id="settingsModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-40">
+    <div class="glass-card w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between mb-4"><h3 class="text-xl font-semibold">Настройки</h3><button id="closeSettings" class="w-8 h-8 rounded-full bg-white/10">✕</button></div>
       <div class="space-y-4">
-        <label class="block"><span class="text-sm">Тема</span>
-          <select id="themeSelect" class="mt-1 w-full rounded-xl bg-black/25 border border-white/15 px-3 py-2 outline-none">
-            <option value="aurora">🌌 Aurora</option>
-            <option value="dusk">🌆 Dusk</option>
-            <option value="ember">🔥 Ember</option>
-          </select>
-        </label>
-        <label class="flex items-center gap-2 cursor-pointer"><input id="liquidGlassToggle" type="checkbox" /> Liquid Glass (эффект стекла)</label>
-        <label class="flex items-center gap-2 cursor-pointer"><input id="hideStatusInput" type="checkbox" /> Скрыть мой статус</label>
+        <select id="themeSelect" class="w-full">
+          <option value="aurora">🌌 Aurora</option>
+          <option value="dusk">🌆 Dusk</option>
+          <option value="ember">🔥 Ember</option>
+        </select>
+        <label class="flex items-center gap-2"><input type="checkbox" id="liquidGlassToggle" /> Liquid Glass</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="hideStatusInput" /> Скрыть статус</label>
         <hr class="border-white/20" />
-        <div><label class="text-sm font-semibold">❄️ Снегопад</label>
-          <label class="flex items-center gap-2 mt-1 cursor-pointer"><input id="snowEnabled" type="checkbox" /> Включить снегопад</label>
-          <label class="block mt-2">Количество: <input id="snowCount" type="range" min="0" max="150" value="40" class="w-full" /><span id="snowCountVal">40</span></label>
-          <label class="block mt-1">Размер: <input id="snowSize" type="range" min="2" max="10" step="1" value="4" class="w-full" /><span id="snowSizeVal">4</span>px</label>
-          <label class="block mt-1">Скорость: <input id="snowSpeed" type="range" min="3" max="12" step="1" value="6" class="w-full" /><span id="snowSpeedVal">6</span> сек</label>
+        <div>
+          <label class="flex items-center gap-2"><input type="checkbox" id="snowEnabled" /> ❄️ Снегопад</label>
+          <div class="mt-2">Количество: <input type="range" id="snowCount" min="0" max="150" value="40" /><span id="snowCountVal">40</span></div>
+          <div>Размер: <input type="range" id="snowSize" min="2" max="10" value="4" /><span id="snowSizeVal">4</span>px</div>
+          <div>Скорость: <input type="range" id="snowSpeed" min="3" max="12" value="6" /><span id="snowSpeedVal">6</span>c</div>
         </div>
-        <button id="saveSettingsBtn" class="btn-primary w-full py-3 rounded-xl">Сохранить</button>
-        <p id="settingsInfo" class="text-sm"></p>
-        <div class="text-center pt-2 border-t border-white/10"><button id="adminTrigger" class="text-sm text-[color:var(--text-muted)] cursor-pointer">*</button></div>
+        <button id="saveSettingsBtn" class="w-full py-2 rounded-xl font-semibold" style="background: var(--accent);">Сохранить</button>
+        <p id="settingsInfo" class="text-sm text-center"></p>
+        <div class="text-center pt-2"><button id="adminTrigger" class="text-sm text-gray-400">*</button></div>
       </div>
     </div>
   </div>
 
-  <!-- Админ панель -->
-  <div id="adminModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm items-center justify-center p-4 z-40" style="display: none;">
-    <div class="glass rounded-3xl w-full max-w-md p-6 fade-in">
+  <!-- АДМИНКА -->
+  <div id="adminModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-45">
+    <div class="glass-card w-full max-w-md p-6">
       <h3 class="text-xl font-semibold mb-3">Админ-панель</h3>
-      <input id="adminUsername" class="w-full rounded-xl bg-black/25 border border-white/15 px-3 py-2 mb-3 outline-none" placeholder="@username" />
-      <div class="space-y-2">
-        <label class="block"><span class="text-sm">NFT Username (новый @)</span>
-          <input id="nftUsernameInput" class="w-full rounded-xl bg-black/25 border border-white/15 px-3 py-2 outline-none" placeholder="@nftnick" />
-        </label>
-        <button id="grantNftBtn" class="btn-secondary w-full py-2 rounded-xl">Выдать NFT @</button>
-        <label class="block"><span class="text-sm">Анонимный номер</span>
-          <input id="manualAnonNumber" class="w-full rounded-xl bg-black/25 border border-white/15 px-3 py-2 outline-none" placeholder="+888123456" />
-        </label>
-        <button id="setManualAnonBtn" class="btn-secondary w-full py-2 rounded-xl">Установить номер</button>
-      </div>
-      <button id="closeAdmin" class="mt-3 w-full py-2 rounded-xl btn-secondary">Закрыть</button>
+      <input id="adminUsername" placeholder="@username" class="w-full mb-3" />
+      <input id="nftUsernameInput" placeholder="NFT @username" class="w-full mb-2" />
+      <button id="grantNftBtn" class="w-full py-2 rounded-xl bg-white/10 mb-3">Выдать NFT @</button>
+      <input id="manualAnonNumber" placeholder="+888123456" class="w-full mb-2" />
+      <button id="setManualAnonBtn" class="w-full py-2 rounded-xl bg-white/10 mb-3">Установить номер</button>
+      <button id="closeAdmin" class="w-full py-2 rounded-xl" style="background: var(--accent);">Закрыть</button>
       <p id="adminInfo" class="text-sm mt-2"></p>
     </div>
   </div>
@@ -286,6 +281,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
   
   <script>
+    // ========== FIREBASE ==========
     const firebaseConfig = {
       apiKey: "AIzaSyCFSUOzWtlK4ldRTSEjPRdWjiL_8s-YQf4",
       authDomain: "pulsarmess.firebaseapp.com",
@@ -296,15 +292,16 @@
       appId: "1:183642047359:web:902ead1993e23e719f504a"
     };
     
-    let app = null, db = null;
+    let db = null;
     try {
       if (typeof firebase !== 'undefined') {
-        app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         db = firebase.database();
-        console.log("Firebase OK");
+        console.log("✅ Firebase connected");
       }
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error("Firebase error:", e); }
     
+    // ========== ПЕРЕМЕННЫЕ ==========
     let currentUser = null;
     let usersCache = {};
     let chatsList = [];
@@ -312,23 +309,41 @@
     let messageUnsub = null;
     let adminClicks = 0;
     let snowInterval = null;
-    let snowActive = false;
     
-    const els = {};
-    const ids = ['authView','appView','loginTab','registerTab','loginForm','registerForm','authError',
-      'loginUsername','loginPassword','regUsername','regNickname','regPassword','myUsernameLabel','myAvatar',
-      'searchInput','searchBtn','searchResult','chatList','logoutBtn','chatTitle','chatStatus',
-      'messages','messageForm','messageInput','openSettings','closeSettings','settingsModal',
-      'hideStatusInput','themeSelect','saveSettingsBtn','settingsInfo','deleteChatBtn',
-      'adminTrigger','adminModal','closeAdmin','adminUsername','grantNftBtn','adminInfo',
-      'manualAnonNumber','setManualAnonBtn','avatarFile','liquidGlassToggle',
-      'snowEnabled','snowCount','snowSize','snowSpeed','snowCountVal','snowSizeVal','snowSpeedVal',
-      'diagnosticBtn','profileModal','closeProfile','profileAvatar','profileNick','profileUsername','profileNft','profileAnon','profileNftBlock','profileAnonBlock',
-      'editProfileModal','closeEditProfile','editAvatarPreview','editNickname','editUsername','saveProfileBtn',
-      'myProfileBtn','nftUsernameInput','deleteChatModal','deleteForMeBtn','deleteForBothBtn','cancelDeleteBtn','deleteInfo'];
+    // DOM элементы
+    const $ = (id) => document.getElementById(id);
+    const elements = {
+      authView: $('authView'), appView: $('appView'),
+      loginTab: $('loginTab'), registerTab: $('registerTab'),
+      loginForm: $('loginForm'), registerForm: $('registerForm'), authError: $('authError'),
+      loginUsername: $('loginUsername'), loginPassword: $('loginPassword'),
+      regUsername: $('regUsername'), regNickname: $('regNickname'), regPassword: $('regPassword'),
+      myUsernameLabel: $('myUsernameLabel'), myAvatar: $('myAvatar'),
+      searchInput: $('searchInput'), searchBtn: $('searchBtn'), searchResult: $('searchResult'),
+      chatList: $('chatList'), logoutBtn: $('logoutBtn'),
+      chatTitle: $('chatTitle'), chatStatus: $('chatStatus'), messages: $('messages'),
+      messageForm: $('messageForm'), messageInput: $('messageInput'),
+      openSettings: $('openSettings'), closeSettings: $('closeSettings'), settingsModal: $('settingsModal'),
+      hideStatusInput: $('hideStatusInput'), themeSelect: $('themeSelect'), saveSettingsBtn: $('saveSettingsBtn'), settingsInfo: $('settingsInfo'),
+      deleteChatBtn: $('deleteChatBtn'),
+      adminTrigger: $('adminTrigger'), adminModal: $('adminModal'), closeAdmin: $('closeAdmin'),
+      adminUsername: $('adminUsername'), grantNftBtn: $('grantNftBtn'), adminInfo: $('adminInfo'),
+      manualAnonNumber: $('manualAnonNumber'), setManualAnonBtn: $('setManualAnonBtn'),
+      nftUsernameInput: $('nftUsernameInput'),
+      avatarFile: $('avatarFile'), liquidGlassToggle: $('liquidGlassToggle'),
+      snowEnabled: $('snowEnabled'), snowCount: $('snowCount'), snowSize: $('snowSize'), snowSpeed: $('snowSpeed'),
+      snowCountVal: $('snowCountVal'), snowSizeVal: $('snowSizeVal'), snowSpeedVal: $('snowSpeedVal'),
+      diagnosticBtn: $('diagnosticBtn'),
+      profileModal: $('profileModal'), closeProfile: $('closeProfile'),
+      profileAvatar: $('profileAvatar'), profileNick: $('profileNick'), profileUsername: $('profileUsername'),
+      profileNft: $('profileNft'), profileAnon: $('profileAnon'), profileNftBlock: $('profileNftBlock'), profileAnonBlock: $('profileAnonBlock'),
+      editProfileModal: $('editProfileModal'), closeEditProfile: $('closeEditProfile'),
+      editAvatarPreview: $('editAvatarPreview'), editNickname: $('editNickname'), editUsername: $('editUsername'), saveProfileBtn: $('saveProfileBtn'),
+      myProfileBtn: $('myProfileBtn'),
+      deleteChatModal: $('deleteChatModal'), deleteForMeBtn: $('deleteForMeBtn'), deleteForBothBtn: $('deleteForBothBtn'), cancelDeleteBtn: $('cancelDeleteBtn'), deleteInfo: $('deleteInfo')
+    };
     
-    ids.forEach(id => { els[id] = document.getElementById(id); });
-    
+    // ========== HELPERS ==========
     function normalizeUsername(raw) {
       let s = String(raw || "").trim();
       if (!s) return "";
@@ -347,18 +362,19 @@
       return name;
     }
     
-    function avatarUrl(u) { 
-      return u?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u?.nickname || "U")}&background=6d28d9&color=fff&bold=true&size=128`; 
+    function avatarUrl(u) {
+      return u?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u?.nickname || "U")}&background=8b5cf6&color=fff&bold=true&size=128`;
     }
     
-    function chatId(a,b) { return [a,b].sort().join("__"); }
-    function showError(el, msg) { if(el) { el.innerHTML = msg; setTimeout(() => { if(el.innerHTML === msg) el.innerHTML = ""; }, 4000); } }
-    function escapeHtml(str) { if (!str) return ""; return String(str).replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+    function chatId(a, b) { return [a, b].sort().join("__"); }
+    function escapeHtml(str) { if (!str) return ""; return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+    function showError(el, msg) { if (el) { el.innerHTML = msg; setTimeout(() => { if (el.innerHTML === msg) el.innerHTML = ""; }, 4000); } }
     
+    // ========== ТЕМЫ ==========
     function applyTheme(theme) {
       document.body.setAttribute("data-theme", theme || "aurora");
       localStorage.setItem("pulsar_theme", theme || "aurora");
-      if (els.themeSelect) els.themeSelect.value = theme || "aurora";
+      if (elements.themeSelect) elements.themeSelect.value = theme || "aurora";
     }
     
     function applyLiquidGlass(enabled) {
@@ -367,14 +383,14 @@
       localStorage.setItem("pulsar_liquid", enabled ? "1" : "0");
     }
     
+    // ========== СНЕГОПАД ==========
     function startSnow(count, size, speedSec) {
-      const container = document.getElementById("snowContainer");
+      const container = $('snowContainer');
       if (!container) return;
       if (snowInterval) clearInterval(snowInterval);
-      snowActive = true;
       
       function createFlake() {
-        if (!snowActive || !els.snowEnabled?.checked) return;
+        if (!elements.snowEnabled?.checked) return;
         const flake = document.createElement("div");
         flake.classList.add("snow-flake");
         const sz = size + Math.random() * 4;
@@ -382,39 +398,32 @@
         flake.style.height = sz + "px";
         flake.style.left = Math.random() * 100 + "%";
         const duration = speedSec + Math.random() * 5;
-        flake.style.animation = `fall ${duration}s linear forwards`;
+        flake.style.animationDuration = duration + "s";
         container.appendChild(flake);
-        setTimeout(() => { if (flake.parentNode) flake.remove(); }, duration * 1000);
+        setTimeout(() => flake.remove(), duration * 1000);
       }
       
       const intervalTime = Math.max(100, Math.min(500, 3000 / Math.max(count, 1)));
       snowInterval = setInterval(createFlake, intervalTime);
     }
     
-    function stopSnow() { 
-      snowActive = false;
-      if (snowInterval) { clearInterval(snowInterval); snowInterval = null; }
-      const c = document.getElementById("snowContainer"); 
-      if (c) c.innerHTML = ""; 
-    }
-    
+    function stopSnow() { if (snowInterval) { clearInterval(snowInterval); snowInterval = null; } const c = $('snowContainer'); if (c) c.innerHTML = ""; }
     function reloadSnow() {
-      if (els.snowEnabled?.checked) {
+      if (elements.snowEnabled?.checked) {
         stopSnow();
-        startSnow(parseInt(els.snowCount?.value || 40), parseInt(els.snowSize?.value || 4), parseInt(els.snowSpeed?.value || 6));
-      } else {
-        stopSnow();
-      }
+        startSnow(parseInt(elements.snowCount?.value || 40), parseInt(elements.snowSize?.value || 4), parseInt(elements.snowSpeed?.value || 6));
+      } else { stopSnow(); }
     }
     
-    if (els.avatarFile) {
-      els.avatarFile.addEventListener("change", (e) => {
+    // ========== АВАТАР ==========
+    if (elements.avatarFile) {
+      elements.avatarFile.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (file && file.type.startsWith("image/")) {
           const reader = new FileReader();
           reader.onload = (ev) => {
             const b64 = ev.target.result;
-            if (els.editAvatarPreview) els.editAvatarPreview.src = b64;
+            if (elements.editAvatarPreview) elements.editAvatarPreview.src = b64;
             localStorage.setItem("pulsar_temp_avatar", b64);
           };
           reader.readAsDataURL(file);
@@ -422,65 +431,66 @@
       });
     }
     
+    // ========== РЕГИСТРАЦИЯ ==========
     async function registerUser(e) {
       e.preventDefault();
-      if (!db) { showError(els.authError, "❌ Firebase не подключён"); return; }
-      const username = normalizeUsername(els.regUsername?.value || "");
-      const nickname = els.regNickname?.value?.trim() || "";
-      const password = els.regPassword?.value || "";
-      if (!username || !nickname || !password) { showError(els.authError, "Заполните все поля"); return; }
+      if (!db) { showError(elements.authError, "❌ Firebase не подключён"); return; }
+      const username = normalizeUsername(elements.regUsername?.value || "");
+      const nickname = elements.regNickname?.value?.trim() || "";
+      const password = elements.regPassword?.value || "";
+      if (!username || !nickname || !password) { showError(elements.authError, "Заполните все поля"); return; }
       try {
         const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(username).get();
-        if (snapshot.exists()) { showError(els.authError, "@ уже занят"); return; }
+        if (snapshot.exists()) { showError(elements.authError, "@ уже занят"); return; }
         const uid = db.ref("users").push().key;
-        const user = { 
-          uid, username, username_lc: username, nickname, password, 
-          avatar: "", hideStatus: false, nftUsername: "", anonNumber: "", 
-          online: true, last_seen: Date.now(), created_at: Date.now() 
+        const user = {
+          uid, username, username_lc: username, nickname, password,
+          avatar: "", hideStatus: false, nftUsername: "", anonNumber: "",
+          online: true, last_seen: Date.now(), created_at: Date.now()
         };
         await db.ref(`users/${uid}`).set(user);
         localStorage.setItem("pulsar_uid", uid);
         currentUser = user;
         await enterApp();
-      } catch(err) { showError(els.authError, err.message); }
+      } catch (err) { showError(elements.authError, err.message); }
     }
     
+    // ========== ВХОД ==========
     async function loginUser(e) {
       e.preventDefault();
-      if (!db) { showError(els.authError, "❌ Firebase не подключён"); return; }
-      const uname = normalizeUsername(els.loginUsername?.value || "");
-      const pass = els.loginPassword?.value || "";
+      if (!db) { showError(elements.authError, "❌ Firebase не подключён"); return; }
+      const uname = normalizeUsername(elements.loginUsername?.value || "");
+      const pass = elements.loginPassword?.value || "";
       try {
         const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { showError(els.authError, "Пользователь не найден"); return; }
+        if (!snapshot.exists()) { showError(elements.authError, "Пользователь не найден"); return; }
         const user = Object.values(snapshot.val())[0];
-        if (user.password !== pass) { showError(els.authError, "Неверный пароль"); return; }
+        if (user.password !== pass) { showError(elements.authError, "Неверный пароль"); return; }
         localStorage.setItem("pulsar_uid", user.uid);
         currentUser = user;
         await db.ref(`users/${user.uid}`).update({ online: true, last_seen: Date.now() });
         await enterApp();
-      } catch(err) { showError(els.authError, err.message); }
+      } catch (err) { showError(elements.authError, err.message); }
     }
     
+    // ========== ОСНОВНОЕ ПРИЛОЖЕНИЕ ==========
     async function enterApp() {
-      if (!els.authView || !els.appView) return;
-      els.authView.classList.add("hidden");
-      els.appView.classList.remove("hidden");
+      if (!elements.authView || !elements.appView) return;
+      elements.authView.classList.add("hidden");
+      elements.appView.classList.remove("hidden");
       updateMyProfileDisplay();
       
       const savedTheme = localStorage.getItem("pulsar_theme") || currentUser?.theme || "aurora";
       applyTheme(savedTheme);
       const liquidState = localStorage.getItem("pulsar_liquid") === "1";
       applyLiquidGlass(liquidState);
-      if (els.liquidGlassToggle) els.liquidGlassToggle.checked = liquidState;
+      if (elements.liquidGlassToggle) elements.liquidGlassToggle.checked = liquidState;
       
       db.ref("users").on("value", (snap) => {
         usersCache = snap.val() || {};
         updateChatsList();
         renderChats();
-        if (selectedPartner && usersCache[selectedPartner]) {
-          renderChatHeader(selectedPartner);
-        }
+        if (selectedPartner && usersCache[selectedPartner]) renderChatHeader(selectedPartner);
         updateMyProfileDisplay();
       });
       
@@ -488,20 +498,20 @@
         if (currentUser?.uid && db) db.ref(`users/${currentUser.uid}`).update({ last_seen: Date.now() });
       }, 30000);
       
-      updateChatsList();
+      await updateChatsList();
       renderChats();
       
-      if (els.snowEnabled) {
+      if (elements.snowEnabled) {
         const savedSnow = localStorage.getItem("pulsar_snow") === "1";
-        els.snowEnabled.checked = savedSnow;
+        elements.snowEnabled.checked = savedSnow;
         if (savedSnow) reloadSnow();
       }
     }
     
     function updateMyProfileDisplay() {
-      if (currentUser && els.myUsernameLabel) {
-        els.myUsernameLabel.innerText = displayUserIdentifier(currentUser);
-        if (els.myAvatar) els.myAvatar.src = avatarUrl(currentUser);
+      if (currentUser && elements.myUsernameLabel) {
+        elements.myUsernameLabel.innerText = displayUserIdentifier(currentUser);
+        if (elements.myAvatar) elements.myAvatar.src = avatarUrl(currentUser);
       }
     }
     
@@ -510,7 +520,6 @@
       const snapshot = await db.ref("messages").get();
       const allMessages = snapshot.val() || {};
       const chatSet = new Set();
-      
       for (const chatIdKey in allMessages) {
         const messages = allMessages[chatIdKey];
         for (const msgId in messages) {
@@ -523,25 +532,23 @@
     }
     
     function renderChats() {
-      if (!els.chatList) return;
+      if (!elements.chatList) return;
       const list = chatsList.filter(uid => uid !== currentUser?.uid && usersCache[uid]);
-      
       if (list.length === 0) {
-        els.chatList.innerHTML = '<p class="text-sm text-[color:var(--text-muted)] text-center py-4">Нет чатов.<br>Найдите пользователя через поиск</p>';
+        elements.chatList.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Нет чатов.<br>Найдите пользователя через поиск</p>';
         return;
       }
-      
-      els.chatList.innerHTML = list.map(uid => {
+      elements.chatList.innerHTML = list.map(uid => {
         const u = usersCache[uid];
         if (!u) return '';
         const isActive = selectedPartner === uid;
         return `
-          <button data-chat="${uid}" class="w-full text-left p-2 rounded-xl ${isActive ? 'chat-item-active bg-white/15' : 'hover:bg-white/5'} transition-all cursor-pointer">
+          <button data-chat="${uid}" class="chat-item w-full text-left p-2 ${isActive ? 'chat-item-active' : ''}">
             <div class="flex gap-3 items-center">
-              <img src="${avatarUrl(u)}" class="w-10 h-10 rounded-full object-cover cursor-pointer" data-profile="${uid}" onerror="this.src='https://ui-avatars.com/api/?name=${u.nickname}&background=6d28d9&color=fff'" />
+              <img src="${avatarUrl(u)}" class="w-10 h-10 rounded-full object-cover cursor-pointer" data-profile="${uid}" />
               <div class="flex-1">
                 <b>${escapeHtml(getDisplayName(u))}</b>
-                <p class="text-xs text-[color:var(--text-muted)]">${escapeHtml(displayUserIdentifier(u))}</p>
+                <p class="text-xs text-gray-400">${escapeHtml(displayUserIdentifier(u))}</p>
               </div>
               <div class="text-xs">${u.online ? '<span class="text-green-400">●</span>' : '<span class="text-gray-500">○</span>'}</div>
             </div>
@@ -549,7 +556,7 @@
         `;
       }).join("");
       
-      Array.from(els.chatList.querySelectorAll("[data-chat]")).forEach(btn => {
+      Array.from(elements.chatList.querySelectorAll("[data-chat]")).forEach(btn => {
         btn.addEventListener("click", (e) => {
           if (e.target.tagName === 'IMG') {
             const uid = e.target.getAttribute('data-profile');
@@ -566,62 +573,51 @@
       selectedPartner = uid;
       renderChats();
       renderChatHeader(uid);
-      if (els.deleteChatBtn) els.deleteChatBtn.classList.remove("hidden");
+      if (elements.deleteChatBtn) elements.deleteChatBtn.classList.remove("hidden");
       
       const cid = chatId(currentUser.uid, uid);
       const messagesRef = db.ref(`messages/${cid}`);
       messageUnsub = messagesRef.on("value", (snap) => {
         const msgs = [];
         snap.forEach(child => { msgs.push({ id: child.key, ...child.val() }); });
-        msgs.sort((a,b) => (a.timestamp||0) - (b.timestamp||0));
+        msgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
         
-        if (els.messages) {
-          const currentMsgIds = Array.from(els.messages.children).map(el => el.getAttribute('data-msg-id'));
-          const newMsgs = msgs.filter(m => !currentMsgIds.includes(m.id));
-          
-          if (existingMsgs.length === 0) {
-            els.messages.innerHTML = msgs.map(m => `
-              <div data-msg-id="${m.id}" class="${m.senderUid === currentUser.uid ? "text-right" : "text-left"} message-enter">
-                <div class="inline-block p-2 rounded-xl bg-white/10 my-1 max-w-[70%] break-words">${escapeHtml(m.text || "")}</div>
+        if (elements.messages) {
+          elements.messages.innerHTML = msgs.map(m => `
+            <div class="${m.senderUid === currentUser.uid ? "text-right" : "text-left"}">
+              <div class="message-bubble inline-block" style="background: ${m.senderUid === currentUser.uid ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}">
+                ${escapeHtml(m.text || "")}
               </div>
-            `).join("");
-          } else {
-            newMsgs.forEach(m => {
-              const msgDiv = document.createElement('div');
-              msgDiv.setAttribute('data-msg-id', m.id);
-              msgDiv.className = m.senderUid === currentUser.uid ? "text-right message-enter" : "text-left message-enter";
-              msgDiv.innerHTML = `<div class="inline-block p-2 rounded-xl bg-white/10 my-1 max-w-[70%] break-words">${escapeHtml(m.text || "")}</div>`;
-              els.messages.appendChild(msgDiv);
-              msgDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            });
-          }
-          els.messages.scrollTop = els.messages.scrollHeight;
+            </div>
+          `).join("");
+          elements.messages.scrollTop = elements.messages.scrollHeight;
         }
       });
     }
     
     function renderChatHeader(uid) {
       const u = usersCache[uid];
-      if (!u || !els.chatTitle) return;
-      els.chatTitle.innerText = getDisplayName(u);
-      if (els.chatStatus) {
-        if (u.hideStatus) els.chatStatus.innerText = "статус скрыт";
-        else els.chatStatus.innerText = u.online ? "🟢 онлайн" : `⚫ был(а) ${new Date(u.last_seen || Date.now()).toLocaleTimeString()}`;
+      if (!u || !elements.chatTitle) return;
+      elements.chatTitle.innerText = getDisplayName(u);
+      if (elements.chatStatus) {
+        if (u.hideStatus) elements.chatStatus.innerText = "статус скрыт";
+        else elements.chatStatus.innerText = u.online ? "🟢 онлайн" : `⚫ был(а) ${new Date(u.last_seen || Date.now()).toLocaleTimeString()}`;
       }
     }
     
-    if (els.messageForm) {
-      els.messageForm.onsubmit = async (e) => {
+    // ========== ОТПРАВКА СООБЩЕНИЙ ==========
+    if (elements.messageForm) {
+      elements.messageForm.onsubmit = async (e) => {
         e.preventDefault();
-        if (!selectedPartner || !els.messageInput?.value.trim() || !db) return;
+        if (!selectedPartner || !elements.messageInput?.value.trim() || !db) return;
         const cid = chatId(currentUser.uid, selectedPartner);
         await db.ref(`messages/${cid}`).push({
           senderUid: currentUser.uid,
           receiverUid: selectedPartner,
-          text: els.messageInput.value.trim(),
+          text: elements.messageInput.value.trim(),
           timestamp: Date.now()
         });
-        els.messageInput.value = "";
+        elements.messageInput.value = "";
         if (!chatsList.includes(selectedPartner)) {
           chatsList.push(selectedPartner);
           renderChats();
@@ -629,250 +625,240 @@
       };
     }
     
-    if (els.searchBtn) {
-      els.searchBtn.onclick = async () => {
-        const uname = normalizeUsername(els.searchInput?.value || "");
-        if (!uname) { if (els.searchResult) els.searchResult.innerText = "Введите @username"; return; }
+    // ========== ПОИСК ==========
+    if (elements.searchBtn) {
+      elements.searchBtn.onclick = async () => {
+        const uname = normalizeUsername(elements.searchInput?.value || "");
+        if (!uname) { if (elements.searchResult) elements.searchResult.innerText = "Введите @username"; return; }
         const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { if (els.searchResult) els.searchResult.innerText = "❌ не найден"; return; }
+        if (!snapshot.exists()) { if (elements.searchResult) elements.searchResult.innerText = "❌ не найден"; return; }
         const u = Object.values(snapshot.val())[0];
         if (u.uid === currentUser.uid) {
-          if (els.searchResult) els.searchResult.innerText = "❌ Нельзя начать чат с собой";
+          if (elements.searchResult) elements.searchResult.innerText = "❌ Нельзя начать чат с собой";
           return;
         }
-        if (els.searchResult) {
-          els.searchResult.innerHTML = `<button id="foundUserBtn" class="btn-secondary p-2 rounded-xl w-full cursor-pointer">${escapeHtml(getDisplayName(u))} — ${escapeHtml(displayUserIdentifier(u))}</button>`;
+        if (elements.searchResult) {
+          elements.searchResult.innerHTML = `<button id="foundUserBtn" class="w-full p-2 rounded-xl bg-white/10">${escapeHtml(getDisplayName(u))} — ${escapeHtml(displayUserIdentifier(u))}</button>`;
           document.getElementById("foundUserBtn")?.addEventListener("click", async () => {
             if (!chatsList.includes(u.uid)) {
               chatsList.push(u.uid);
               renderChats();
             }
             openChat(u.uid);
-            els.searchInput.value = "";
-            els.searchResult.innerHTML = "";
+            elements.searchInput.value = "";
+            elements.searchResult.innerHTML = "";
           });
         }
       };
     }
     
+    // ========== ПРОФИЛЬ ==========
     function openProfile(uid) {
       const u = usersCache[uid];
-      if (!u || !els.profileModal) return;
-      if (els.profileAvatar) els.profileAvatar.src = avatarUrl(u);
-      if (els.profileNick) els.profileNick.innerText = getDisplayName(u);
-      if (els.profileUsername) els.profileUsername.innerText = displayUserIdentifier(u);
+      if (!u || !elements.profileModal) return;
+      elements.profileAvatar.src = avatarUrl(u);
+      elements.profileNick.innerText = getDisplayName(u);
+      elements.profileUsername.innerText = displayUserIdentifier(u);
       
       if (u.nftUsername && u.nftUsername.trim()) {
-        if (els.profileNft) els.profileNft.innerText = u.nftUsername;
-        if (els.profileNftBlock) els.profileNftBlock.classList.remove("hidden");
-      } else {
-        if (els.profileNftBlock) els.profileNftBlock.classList.add("hidden");
-      }
+        elements.profileNft.innerText = u.nftUsername;
+        elements.profileNftBlock.classList.remove("hidden");
+      } else { elements.profileNftBlock.classList.add("hidden"); }
       
       if (u.anonNumber && u.anonNumber.trim()) {
-        if (els.profileAnon) els.profileAnon.innerText = u.anonNumber;
-        if (els.profileAnonBlock) els.profileAnonBlock.classList.remove("hidden");
-      } else {
-        if (els.profileAnonBlock) els.profileAnonBlock.classList.add("hidden");
-      }
+        elements.profileAnon.innerText = u.anonNumber;
+        elements.profileAnonBlock.classList.remove("hidden");
+      } else { elements.profileAnonBlock.classList.add("hidden"); }
       
-      els.profileModal.style.display = "flex";
+      elements.profileModal.style.display = "flex";
     }
     
     function openMyProfile() {
-      if (!els.editProfileModal) return;
-      if (els.editNickname) els.editNickname.value = currentUser?.nickname || "";
-      if (els.editUsername) els.editUsername.value = currentUser?.username || "";
-      if (els.editAvatarPreview) els.editAvatarPreview.src = avatarUrl(currentUser);
-      els.editProfileModal.style.display = "flex";
+      if (!elements.editProfileModal) return;
+      elements.editNickname.value = currentUser?.nickname || "";
+      elements.editUsername.value = currentUser?.username || "";
+      elements.editAvatarPreview.src = avatarUrl(currentUser);
+      elements.editProfileModal.style.display = "flex";
     }
     
     async function saveMyProfile() {
       if (!currentUser || !db) return;
-      const newNickname = els.editNickname?.value.trim() || "";
-      const newUsername = normalizeUsername(els.editUsername?.value || "");
+      const newNickname = elements.editNickname?.value.trim() || "";
+      const newUsername = normalizeUsername(elements.editUsername?.value || "");
       const newAvatar = localStorage.getItem("pulsar_temp_avatar") || currentUser.avatar;
-      
-      if (!newNickname || !newUsername) { showError(els.settingsInfo, "Заполните поля"); return; }
-      
+      if (!newNickname || !newUsername) { showError(elements.settingsInfo, "Заполните поля"); return; }
       if (newUsername !== currentUser.username) {
         const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(newUsername).get();
         if (snapshot.exists()) {
           const other = Object.values(snapshot.val())[0];
-          if (other.uid !== currentUser.uid) {
-            showError(els.settingsInfo, "@ уже занят");
-            return;
-          }
+          if (other.uid !== currentUser.uid) { showError(elements.settingsInfo, "@ уже занят"); return; }
         }
       }
-      
       const updates = { nickname: newNickname, username: newUsername, username_lc: newUsername, avatar: newAvatar };
       await db.ref(`users/${currentUser.uid}`).update(updates);
       currentUser = { ...currentUser, ...updates };
       localStorage.removeItem("pulsar_temp_avatar");
       updateMyProfileDisplay();
       renderChats();
-      els.editProfileModal.style.display = "none";
-      if (els.settingsInfo) els.settingsInfo.innerText = "✅ Профиль обновлён";
-      setTimeout(() => { if (els.settingsInfo) els.settingsInfo.innerText = ""; }, 2000);
+      elements.editProfileModal.style.display = "none";
+      if (elements.settingsInfo) elements.settingsInfo.innerText = "✅ Профиль обновлён";
+      setTimeout(() => { if (elements.settingsInfo) elements.settingsInfo.innerText = ""; }, 2000);
     }
     
-    if (els.deleteChatBtn) {
-      els.deleteChatBtn.onclick = () => {
-        if (!selectedPartner) return;
-        if (els.deleteChatModal) els.deleteChatModal.style.display = "flex";
-      };
+    // ========== УДАЛЕНИЕ ЧАТА ==========
+    if (elements.deleteChatBtn) {
+      elements.deleteChatBtn.onclick = () => { if (selectedPartner) elements.deleteChatModal.style.display = "flex"; };
     }
-    
-    if (els.deleteForMeBtn) {
-      els.deleteForMeBtn.onclick = async () => {
+    if (elements.deleteForMeBtn) {
+      elements.deleteForMeBtn.onclick = async () => {
         if (!selectedPartner || !db) return;
         const cid = chatId(currentUser.uid, selectedPartner);
         await db.ref(`messages/${cid}`).remove();
         const index = chatsList.indexOf(selectedPartner);
         if (index !== -1) chatsList.splice(index, 1);
         renderChats();
-        if (els.messages) els.messages.innerHTML = "";
+        elements.messages.innerHTML = "";
         selectedPartner = null;
-        if (els.chatTitle) els.chatTitle.innerText = "Нет диалога";
-        if (els.chatStatus) els.chatStatus.innerText = "";
-        if (els.deleteChatBtn) els.deleteChatBtn.classList.add("hidden");
-        if (els.deleteChatModal) els.deleteChatModal.style.display = "none";
+        elements.chatTitle.innerText = "Нет диалога";
+        elements.chatStatus.innerText = "";
+        elements.deleteChatBtn.classList.add("hidden");
+        elements.deleteChatModal.style.display = "none";
       };
     }
-    
-    if (els.deleteForBothBtn) {
-      els.deleteForBothBtn.onclick = async () => {
+    if (elements.deleteForBothBtn) {
+      elements.deleteForBothBtn.onclick = async () => {
         if (!selectedPartner || !db) return;
         const cid = chatId(currentUser.uid, selectedPartner);
         await db.ref(`messages/${cid}`).remove();
         const index = chatsList.indexOf(selectedPartner);
         if (index !== -1) chatsList.splice(index, 1);
         renderChats();
-        if (els.messages) els.messages.innerHTML = "";
+        elements.messages.innerHTML = "";
         selectedPartner = null;
-        if (els.chatTitle) els.chatTitle.innerText = "Нет диалога";
-        if (els.chatStatus) els.chatStatus.innerText = "";
-        if (els.deleteChatBtn) els.deleteChatBtn.classList.add("hidden");
-        if (els.deleteChatModal) els.deleteChatModal.style.display = "none";
+        elements.chatTitle.innerText = "Нет диалога";
+        elements.chatStatus.innerText = "";
+        elements.deleteChatBtn.classList.add("hidden");
+        elements.deleteChatModal.style.display = "none";
       };
     }
-    
-    if (els.cancelDeleteBtn) {
-      els.cancelDeleteBtn.onclick = () => {
-        if (els.deleteChatModal) els.deleteChatModal.style.display = "none";
-      };
+    if (elements.cancelDeleteBtn) {
+      elements.cancelDeleteBtn.onclick = () => { elements.deleteChatModal.style.display = "none"; };
     }
     
-    if (els.saveSettingsBtn) {
-      els.saveSettingsBtn.onclick = async () => {
+    // ========== НАСТРОЙКИ ==========
+    if (elements.saveSettingsBtn) {
+      elements.saveSettingsBtn.onclick = async () => {
         if (!currentUser || !db) return;
         const updates = {
-          hideStatus: !!els.hideStatusInput?.checked,
-          theme: els.themeSelect?.value || "aurora"
+          hideStatus: !!elements.hideStatusInput?.checked,
+          theme: elements.themeSelect?.value || "aurora"
         };
         await db.ref(`users/${currentUser.uid}`).update(updates);
         currentUser = { ...currentUser, ...updates };
         applyTheme(updates.theme);
-        applyLiquidGlass(!!els.liquidGlassToggle?.checked);
-        localStorage.setItem("pulsar_snow", els.snowEnabled?.checked ? "1" : "0");
+        applyLiquidGlass(!!elements.liquidGlassToggle?.checked);
+        localStorage.setItem("pulsar_snow", elements.snowEnabled?.checked ? "1" : "0");
         reloadSnow();
-        if (els.settingsInfo) els.settingsInfo.innerText = "✅ Сохранено!";
-        setTimeout(() => { if (els.settingsInfo) els.settingsInfo.innerText = ""; }, 2000);
+        if (elements.settingsInfo) elements.settingsInfo.innerText = "✅ Сохранено!";
+        setTimeout(() => { if (elements.settingsInfo) elements.settingsInfo.innerText = ""; }, 2000);
       };
     }
     
-    if (els.adminTrigger) {
-      els.adminTrigger.onclick = () => {
+    // ========== АДМИНКА ==========
+    if (elements.adminTrigger) {
+      elements.adminTrigger.onclick = () => {
         adminClicks++;
-        if (adminClicks >= 5) {
-          adminClicks = 0;
-          if (els.adminModal) els.adminModal.style.display = "flex";
-        }
+        if (adminClicks >= 5) { adminClicks = 0; elements.adminModal.style.display = "flex"; }
       };
     }
-    
-    if (els.grantNftBtn) {
-      els.grantNftBtn.onclick = async () => {
-        const uname = normalizeUsername(els.adminUsername?.value || "");
-        const nftName = normalizeUsername(els.nftUsernameInput?.value || "");
-        if (!nftName) { if (els.adminInfo) els.adminInfo.innerText = "Введите NFT @username"; return; }
+    if (elements.grantNftBtn) {
+      elements.grantNftBtn.onclick = async () => {
+        const uname = normalizeUsername(elements.adminUsername?.value || "");
+        const nftName = normalizeUsername(elements.nftUsernameInput?.value || "");
+        if (!nftName) { if (elements.adminInfo) elements.adminInfo.innerText = "Введите NFT @username"; return; }
         const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { if (els.adminInfo) els.adminInfo.innerText = "❌ Пользователь не найден"; return; }
+        if (!snapshot.exists()) { if (elements.adminInfo) elements.adminInfo.innerText = "❌ Не найден"; return; }
         const uid = Object.keys(snapshot.val())[0];
         await db.ref(`users/${uid}`).update({ nftUsername: nftName });
-        if (els.adminInfo) els.adminInfo.innerText = `✅ Выдан NFT: ${nftName}`;
+        if (elements.adminInfo) elements.adminInfo.innerText = `✅ Выдан: ${nftName}`;
       };
     }
-    
-    if (els.setManualAnonBtn) {
-      els.setManualAnonBtn.onclick = async () => {
-        const uname = normalizeUsername(els.adminUsername?.value || "");
-        const num = els.manualAnonNumber?.value.trim() || "";
-        if (!num.startsWith("+888")) { if (els.adminInfo) els.adminInfo.innerText = "Номер должен начинаться с +888"; return; }
+    if (elements.setManualAnonBtn) {
+      elements.setManualAnonBtn.onclick = async () => {
+        const uname = normalizeUsername(elements.adminUsername?.value || "");
+        const num = elements.manualAnonNumber?.value.trim() || "";
+        if (!num.startsWith("+888")) { if (elements.adminInfo) elements.adminInfo.innerText = "Номер должен начинаться с +888"; return; }
         const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { if (els.adminInfo) els.adminInfo.innerText = "❌ Пользователь не найден"; return; }
+        if (!snapshot.exists()) { if (elements.adminInfo) elements.adminInfo.innerText = "❌ Не найден"; return; }
         const uid = Object.keys(snapshot.val())[0];
         await db.ref(`users/${uid}`).update({ anonNumber: num });
-        if (els.adminInfo) els.adminInfo.innerText = `✅ Номер: ${num}`;
+        if (elements.adminInfo) elements.adminInfo.innerText = `✅ Номер: ${num}`;
       };
     }
+    if (elements.closeAdmin) {
+      elements.closeAdmin.onclick = () => { elements.adminModal.style.display = "none"; };
+    }
     
-    if (els.logoutBtn) {
-      els.logoutBtn.onclick = async () => {
+    // ========== ВЫХОД ==========
+    if (elements.logoutBtn) {
+      elements.logoutBtn.onclick = async () => {
         if (currentUser?.uid && db) await db.ref(`users/${currentUser.uid}`).update({ online: false, last_seen: Date.now() });
         localStorage.removeItem("pulsar_uid");
         location.reload();
       };
     }
     
-    if (els.loginTab) {
-      els.loginTab.onclick = () => {
-        els.loginForm.classList.remove("hidden");
-        els.registerForm.classList.add("hidden");
-        els.loginTab.classList.add("bg-white/15");
-        els.registerTab.classList.remove("bg-white/15");
+    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+    if (elements.loginTab) {
+      elements.loginTab.onclick = () => {
+        elements.loginForm.classList.remove("hidden");
+        elements.registerForm.classList.add("hidden");
+        elements.loginTab.classList.add("bg-white/10");
+        elements.registerTab.classList.remove("bg-white/10");
       };
     }
-    if (els.registerTab) {
-      els.registerTab.onclick = () => {
-        els.registerForm.classList.remove("hidden");
-        els.loginForm.classList.add("hidden");
-        els.registerTab.classList.add("bg-white/15");
-        els.loginTab.classList.remove("bg-white/15");
-      };
-    }
-    
-    if (els.openSettings) {
-      els.openSettings.onclick = () => {
-        if (els.hideStatusInput) els.hideStatusInput.checked = currentUser?.hideStatus || false;
-        if (els.themeSelect) els.themeSelect.value = currentUser?.theme || "aurora";
-        if (els.liquidGlassToggle) els.liquidGlassToggle.checked = localStorage.getItem("pulsar_liquid") === "1";
-        if (els.snowEnabled) els.snowEnabled.checked = localStorage.getItem("pulsar_snow") === "1";
-        if (els.settingsModal) els.settingsModal.style.display = "flex";
-      };
-    }
-    if (els.closeSettings) els.closeSettings.onclick = () => { if (els.settingsModal) els.settingsModal.style.display = "none"; };
-    if (els.closeAdmin) els.closeAdmin.onclick = () => { if (els.adminModal) els.adminModal.style.display = "none"; };
-    if (els.closeProfile) els.closeProfile.onclick = () => { if (els.profileModal) els.profileModal.style.display = "none"; };
-    if (els.closeEditProfile) els.closeEditProfile.onclick = () => { if (els.editProfileModal) els.editProfileModal.style.display = "none"; };
-    if (els.saveProfileBtn) els.saveProfileBtn.onclick = saveMyProfile;
-    if (els.myProfileBtn) els.myProfileBtn.onclick = openMyProfile;
-    
-    if (els.snowEnabled) els.snowEnabled.onchange = reloadSnow;
-    if (els.snowCount) els.snowCount.oninput = () => { if (els.snowCountVal) els.snowCountVal.innerText = els.snowCount.value; reloadSnow(); };
-    if (els.snowSize) els.snowSize.oninput = () => { if (els.snowSizeVal) els.snowSizeVal.innerText = els.snowSize.value; reloadSnow(); };
-    if (els.snowSpeed) els.snowSpeed.oninput = () => { if (els.snowSpeedVal) els.snowSpeedVal.innerText = els.snowSpeed.value; reloadSnow(); };
-    
-    if (els.diagnosticBtn) {
-      els.diagnosticBtn.onclick = () => {
-        alert(`🔍 Диагностика Pulsar\n\n✅ Firebase: ${db ? "Подключён" : "НЕ подключён"}\n✅ Пользователь: ${currentUser ? currentUser.nickname : "не авторизован"}\n📋 Чатов: ${chatsList.length}\n🌐 Браузер: ${navigator.userAgent.split(' ').slice(-2).join(' ')}`);
+    if (elements.registerTab) {
+      elements.registerTab.onclick = () => {
+        elements.registerForm.classList.remove("hidden");
+        elements.loginForm.classList.add("hidden");
+        elements.registerTab.classList.add("bg-white/10");
+        elements.loginTab.classList.remove("bg-white/10");
       };
     }
     
+    // ========== МОДАЛКИ ==========
+    if (elements.openSettings) {
+      elements.openSettings.onclick = () => {
+        if (elements.hideStatusInput) elements.hideStatusInput.checked = currentUser?.hideStatus || false;
+        if (elements.themeSelect) elements.themeSelect.value = currentUser?.theme || "aurora";
+        if (elements.liquidGlassToggle) elements.liquidGlassToggle.checked = localStorage.getItem("pulsar_liquid") === "1";
+        if (elements.snowEnabled) elements.snowEnabled.checked = localStorage.getItem("pulsar_snow") === "1";
+        elements.settingsModal.style.display = "flex";
+      };
+    }
+    if (elements.closeSettings) elements.closeSettings.onclick = () => { elements.settingsModal.style.display = "none"; };
+    if (elements.closeProfile) elements.closeProfile.onclick = () => { elements.profileModal.style.display = "none"; };
+    if (elements.closeEditProfile) elements.closeEditProfile.onclick = () => { elements.editProfileModal.style.display = "none"; };
+    if (elements.saveProfileBtn) elements.saveProfileBtn.onclick = saveMyProfile;
+    if (elements.myProfileBtn) elements.myProfileBtn.onclick = openMyProfile;
+    
+    // ========== СНЕГОПАД НАСТРОЙКИ ==========
+    if (elements.snowEnabled) elements.snowEnabled.onchange = reloadSnow;
+    if (elements.snowCount) elements.snowCount.oninput = () => { elements.snowCountVal.innerText = elements.snowCount.value; reloadSnow(); };
+    if (elements.snowSize) elements.snowSize.oninput = () => { elements.snowSizeVal.innerText = elements.snowSize.value; reloadSnow(); };
+    if (elements.snowSpeed) elements.snowSpeed.oninput = () => { elements.snowSpeedVal.innerText = elements.snowSpeed.value; reloadSnow(); };
+    
+    // ========== ДИАГНОСТИКА ==========
+    if (elements.diagnosticBtn) {
+      elements.diagnosticBtn.onclick = () => {
+        alert(`🔍 Pulsar Диагностика\n\n✅ Firebase: ${db ? "Подключён" : "НЕ подключён"}\n✅ Пользователь: ${currentUser ? currentUser.nickname : "нет"}\n📋 Чатов: ${chatsList.length}\n🌐 Браузер: ${navigator.userAgent.split(' ').slice(-2).join(' ')}\n📱 Экран: ${window.innerWidth}x${window.innerHeight}`);
+      };
+    }
+    
+    // ========== АВТОВХОД ==========
     (async function autoLogin() {
-      if (els.loginForm) els.loginForm.onsubmit = loginUser;
-      if (els.registerForm) els.registerForm.onsubmit = registerUser;
+      if (elements.loginForm) elements.loginForm.onsubmit = loginUser;
+      if (elements.registerForm) elements.registerForm.onsubmit = registerUser;
       const uid = localStorage.getItem("pulsar_uid");
       if (uid && db) {
         const snap = await db.ref(`users/${uid}`).get();
