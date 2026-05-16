@@ -131,7 +131,6 @@
       box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
     }
     
-    /* Кастомный аудиоплеер */
     .custom-audio {
       display: flex;
       align-items: center;
@@ -263,6 +262,7 @@
       padding: 8px 16px;
       border-radius: 30px;
       color: var(--text-muted);
+      background: transparent;
     }
     .mobile-nav button.active {
       background: rgba(124,58,237,0.3);
@@ -413,10 +413,10 @@
       </div>
     </div>
 
-    <!-- Мобильный вид (без поиска, только чаты и диалог) -->
+    <!-- Мобильный вид -->
     <div class="mobile-view" style="display: none; height: 100%; flex-direction: column;">
-      <!-- Вид "Список чатов" -->
-      <div id="mobileChatsView" class="glass-card" style="flex: 1; margin: 12px; display: flex; flex-direction: column; overflow: hidden;">
+      <!-- Экран чатов (список чатов + поиск) -->
+      <div id="mobileChatsScreen" class="glass-card" style="flex: 1; margin: 12px; display: flex; flex-direction: column; overflow: hidden;">
         <div class="px-4 py-3 border-b border-white/10 flex items-center gap-3">
           <img id="mobileMyAvatar" class="w-10 h-10 rounded-full object-cover border-2" style="border-color: var(--accent);" src="" />
           <div>
@@ -425,13 +425,18 @@
           </div>
         </div>
         <div class="p-3">
+          <div class="flex gap-2 mb-3">
+            <input id="mobileSearchInput" placeholder="Поиск @username" class="flex-1" />
+            <button id="mobileSearchBtn" class="px-4 rounded-full bg-white/10">🔍</button>
+          </div>
+          <div id="mobileSearchResult" class="text-sm mb-3"></div>
           <p class="text-xs text-gray-400 mb-2">ЧАТЫ</p>
-          <div id="mobileChatList" class="overflow-y-auto space-y-1" style="max-height: 70vh;"></div>
+          <div id="mobileChatList" class="overflow-y-auto space-y-1" style="max-height: 55vh;"></div>
         </div>
       </div>
       
-      <!-- Вид "Окно чата" (изначально скрыт) -->
-      <div id="mobileMessagesView" class="glass-card" style="flex: 1; margin: 12px; display: none; flex-direction: column; overflow: hidden;">
+      <!-- Экран чата (окно переписки) -->
+      <div id="mobileChatScreen" class="glass-card" style="flex: 1; margin: 12px; display: none; flex-direction: column; overflow: hidden;">
         <div class="px-3 py-2 border-b border-white/10 flex items-center gap-3">
           <button id="mobileBackBtn" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">←</button>
           <div>
@@ -453,7 +458,7 @@
       </div>
     </div>
 
-    <!-- Нижняя навигация (только 3 кнопки: чаты, профиль, настройки) -->
+    <!-- Нижняя навигация -->
     <div class="mobile-nav">
       <button id="navChatsBtn" class="active">💬</button>
       <button id="navProfileBtn">👤</button>
@@ -559,8 +564,6 @@
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
-    
-    let mobileMessageUnsub = null;
     
     function $(id) { return document.getElementById(id); }
     
@@ -709,8 +712,7 @@
       if (!$('authView') || !$('appView')) return; 
       $('authView').classList.add("hidden"); 
       $('appView').classList.remove("hidden"); 
-      updateMyProfileDisplay();
-      updateMobileMyProfileDisplay();
+      updateProfileDisplay();
       
       const savedTheme = localStorage.getItem("pulsar_theme") || currentUser?.theme || "default"; 
       applyTheme(savedTheme); 
@@ -719,17 +721,16 @@
       if($('liquidGlassToggle')) { if(liquidState) $('liquidGlassToggle').classList.add('checked'); else $('liquidGlassToggle').classList.remove('checked'); } 
       if($('hideStatusToggle') && currentUser?.hideStatus) $('hideStatusToggle').classList.add('checked'); 
       
-      db.ref("users").on("value", (snap) => { 
+      db.ref("users").on("value", async (snap) => { 
         usersCache = snap.val() || {}; 
-        updateChatsList(); 
+        await updateChatsList(); 
         renderChats(); 
         renderMobileChats();
         if (selectedPartner && usersCache[selectedPartner]) {
           renderChatHeader(selectedPartner);
           renderMobileChatHeader(selectedPartner);
         }
-        updateMyProfileDisplay();
-        updateMobileMyProfileDisplay();
+        updateProfileDisplay();
       }); 
       
       setInterval(() => { if (currentUser?.uid && db) db.ref(`users/${currentUser.uid}`).update({ last_seen: Date.now() }); }, 30000); 
@@ -741,18 +742,13 @@
       checkMobileView();
     }
     
-    function updateMyProfileDisplay() { 
+    function updateProfileDisplay() { 
       if (currentUser && $('myUsernameLabel')) { 
         $('myUsernameLabel').innerText = displayUserIdentifier(currentUser); 
         if ($('myAvatar')) $('myAvatar').src = avatarUrl(currentUser); 
+        if ($('mobileMyUsernameLabel')) $('mobileMyUsernameLabel').innerText = displayUserIdentifier(currentUser); 
+        if ($('mobileMyAvatar')) $('mobileMyAvatar').src = avatarUrl(currentUser); 
       } 
-    }
-    
-    function updateMobileMyProfileDisplay() {
-      if (currentUser && $('mobileMyUsernameLabel')) {
-        $('mobileMyUsernameLabel').innerText = displayUserIdentifier(currentUser);
-        if ($('mobileMyAvatar')) $('mobileMyAvatar').src = avatarUrl(currentUser);
-      }
     }
     
     async function updateChatsList() { 
@@ -786,7 +782,7 @@
       }).join(""); 
       
       Array.from($('chatList').querySelectorAll("[data-chat]")).forEach(el => { 
-        el.addEventListener("click", (e) => { 
+        el.onclick = (e) => { 
           if (e.target.tagName === 'IMG') { 
             const uid = e.target.getAttribute('data-profile'); 
             if (uid) openProfile(uid); 
@@ -794,7 +790,7 @@
             const uid = el.getAttribute('data-chat');
             if (uid) openChat(uid); 
           } 
-        }); 
+        }; 
       }); 
     }
     
@@ -813,7 +809,7 @@
       }).join("");
       
       Array.from($('mobileChatList').querySelectorAll("[data-mobile-chat]")).forEach(el => {
-        el.addEventListener("click", (e) => {
+        el.onclick = (e) => {
           if (e.target.tagName === 'IMG') {
             const uid = e.target.getAttribute('data-mobile-profile');
             if (uid) openProfile(uid);
@@ -821,7 +817,7 @@
             const uid = el.getAttribute('data-mobile-chat');
             if (uid) openMobileChat(uid);
           }
-        });
+        };
       });
     }
     
@@ -940,8 +936,8 @@
     
     async function openMobileChat(uid) {
       await openChat(uid);
-      $('mobileChatsView').style.display = 'none';
-      $('mobileMessagesView').style.display = 'flex';
+      $('mobileChatsScreen').style.display = 'none';
+      $('mobileChatScreen').style.display = 'flex';
     }
     
     function renderChatHeader(uid) { 
@@ -975,7 +971,7 @@
       } 
     }
     
-    // Обработчики для десктопа
+    // Десктоп обработчики
     if ($('messageForm')) {
       $('messageForm').onsubmit = async (e) => { 
         e.preventDefault(); 
@@ -1034,7 +1030,7 @@
       };
     }
     
-    // Обработчики для мобильной версии
+    // Мобильные обработчики
     if ($('mobileMessageForm')) {
       $('mobileMessageForm').onsubmit = async (e) => {
         e.preventDefault();
@@ -1095,13 +1091,34 @@
     
     if ($('mobileBackBtn')) {
       $('mobileBackBtn').onclick = () => {
-        $('mobileMessagesView').style.display = 'none';
-        $('mobileChatsView').style.display = 'flex';
+        $('mobileChatScreen').style.display = 'none';
+        $('mobileChatsScreen').style.display = 'flex';
         if ($('navChatsBtn')) $('navChatsBtn').click();
       };
     }
     
-    // Поиск (только десктоп)
+    // Поиск на телефоне
+    if ($('mobileSearchBtn')) {
+      $('mobileSearchBtn').onclick = async () => {
+        const uname = normalizeUsername($('mobileSearchInput')?.value || "");
+        if (!uname) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "Введите @username"; return; }
+        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
+        if (!snapshot.exists()) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "❌ не найден"; return; }
+        const u = Object.values(snapshot.val())[0];
+        if (u.uid === currentUser.uid) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "Нельзя начать чат с собой"; return; }
+        if ($('mobileSearchResult')) {
+          $('mobileSearchResult').innerHTML = `<button id="mobileFoundUserBtn" class="w-full p-2 rounded-xl bg-white/10">${escapeHtml(getDisplayName(u))} — ${escapeHtml(displayUserIdentifier(u))}</button>`;
+          document.getElementById("mobileFoundUserBtn")?.addEventListener("click", async () => {
+            if (!chatsList.includes(u.uid)) { chatsList.push(u.uid); renderChats(); renderMobileChats(); }
+            openMobileChat(u.uid);
+            $('mobileSearchInput').value = "";
+            $('mobileSearchResult').innerHTML = "";
+          });
+        }
+      };
+    }
+    
+    // Поиск на десктопе
     if ($('searchBtn')) {
       $('searchBtn').onclick = async () => {
         const uname = normalizeUsername($('searchInput')?.value || "");
@@ -1158,8 +1175,7 @@
       await db.ref(`users/${currentUser.uid}`).update(updates);
       currentUser = { ...currentUser, ...updates };
       localStorage.removeItem("pulsar_temp_avatar");
-      updateMyProfileDisplay();
-      updateMobileMyProfileDisplay();
+      updateProfileDisplay();
       renderChats();
       renderMobileChats();
       $('editProfileModal').style.display = "none";
@@ -1379,8 +1395,11 @@
         navChats.onclick = () => {
           [navChats, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
           navChats.classList.add('active');
-          $('mobileChatsView').style.display = 'flex';
-          $('mobileMessagesView').style.display = 'none';
+          $('mobileChatsScreen').style.display = 'flex';
+          $('mobileChatScreen').style.display = 'none';
+          if ($('settingsModal') && $('settingsModal').style.display === 'flex') $('settingsModal').style.display = 'none';
+          if ($('editProfileModal') && $('editProfileModal').style.display === 'flex') $('editProfileModal').style.display = 'none';
+          if ($('profileModal') && $('profileModal').style.display === 'flex') $('profileModal').style.display = 'none';
         };
       }
       if (navProfile) {
