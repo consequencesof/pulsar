@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover" />
   <title>Pulsar</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -72,15 +72,7 @@
       transition: all 0.3s ease;
       box-shadow: 0 0 20px var(--glow-color);
     }
-    
-    .glass-card:hover {
-      box-shadow: 0 0 30px var(--glow-color);
-    }
 
-    @keyframes gradient-shift {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
     .pulsar-title {
       background: linear-gradient(90deg, #FFFFFF 0%, var(--accent) 50%, var(--accent-glow) 100%);
       background-size: 200% auto;
@@ -88,6 +80,10 @@
       background-clip: text;
       color: transparent;
       animation: gradient-shift 2.5s ease infinite alternate;
+    }
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
     }
 
     .message-bubble {
@@ -107,8 +103,8 @@
       border-radius: 16px;
       cursor: pointer;
     }
-    .chat-item:hover { background: rgba(124, 58, 237, 0.15); transform: translateX(4px); box-shadow: 0 0 10px var(--glow-color); }
-    .chat-item-active { background: rgba(124, 58, 237, 0.25); border-left: 3px solid var(--accent); box-shadow: 0 0 15px var(--glow-color); }
+    .chat-item:hover { background: rgba(124, 58, 237, 0.15); transform: translateX(4px); }
+    .chat-item-active { background: rgba(124, 58, 237, 0.25); border-left: 3px solid var(--accent); }
 
     .snow-flake {
       position: fixed;
@@ -228,19 +224,55 @@
       background: rgba(124, 58, 237, 0.2);
     }
     
-    .modal-enter {
-      animation: modalFadeIn 0.25s ease;
+    .hidden { display: none; }
+    
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-light);
+      padding: 12px 24px;
+      justify-content: space-around;
+      z-index: 100;
+      backdrop-filter: blur(10px);
     }
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
+    .mobile-nav button {
+      font-size: 24px;
+      padding: 8px;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    .mobile-nav button.active {
+      background: rgba(124, 58, 237, 0.3);
+      color: var(--accent);
     }
     
-    .hidden { display: none; }
+    @media (max-width: 768px) {
+      .mobile-nav {
+        display: flex;
+      }
+      .desktop-sidebar {
+        display: none !important;
+      }
+      .mobile-view {
+        display: flex !important;
+        flex-direction: column;
+        height: 100%;
+      }
+      .app-container {
+        padding-bottom: 70px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body data-theme="default">
-  <div id="snowContainer"></div>
+  <div id="snowContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 9999;"></div>
 
   <!-- АВТОРИЗАЦИЯ -->
   <div id="authView" class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -267,7 +299,7 @@
     </div>
   </div>
 
-  <!-- ПРОФИЛЬ МОДАЛКА -->
+  <!-- МОДАЛКИ -->
   <div id="profileModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-50">
     <div class="glass-card w-full max-w-md p-6 text-center">
       <img id="profileAvatar" class="w-24 h-24 rounded-full mx-auto object-cover border-2" style="border-color: var(--accent);" src="" />
@@ -285,7 +317,6 @@
     </div>
   </div>
 
-  <!-- РЕДАКТИРОВАНИЕ ПРОФИЛЯ -->
   <div id="editProfileModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-50">
     <div class="glass-card w-full max-w-md p-6">
       <h3 class="text-xl font-semibold text-center mb-4">Редактировать</h3>
@@ -300,7 +331,6 @@
     </div>
   </div>
 
-  <!-- УДАЛЕНИЕ ЧАТА -->
   <div id="deleteChatModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-50">
     <div class="glass-card w-full max-w-sm p-6 text-center">
       <h3 class="text-xl font-semibold mb-3">Удалить чат?</h3>
@@ -310,7 +340,6 @@
     </div>
   </div>
 
-  <!-- ПОДТВЕРЖДЕНИЕ ВЫХОДА -->
   <div id="confirmLogoutModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-50">
     <div class="glass-card w-full max-w-sm p-6 text-center">
       <h3 class="text-xl font-semibold mb-3">Выйти из аккаунта?</h3>
@@ -320,10 +349,10 @@
   </div>
 
   <!-- ГЛАВНОЕ ПРИЛОЖЕНИЕ -->
-  <div id="appView" class="hidden h-screen p-3">
-    <div class="h-full grid md:grid-cols-[320px_1fr] gap-3">
-      <!-- Боковая панель -->
-      <div class="glass-card p-4 flex flex-col min-h-0">
+  <div id="appView" class="hidden app-container" style="height: 100vh; display: flex; flex-direction: column;">
+    <!-- Десктопный вид -->
+    <div class="desktop-sidebar" style="display: flex; height: 100%; padding: 12px; gap: 12px;">
+      <div class="glass-card" style="width: 320px; padding: 16px; display: flex; flex-direction: column; overflow: hidden;">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3 cursor-pointer" id="myProfileBtn">
             <img id="myAvatar" class="w-12 h-12 rounded-full object-cover border-2" style="border-color: var(--accent);" src="" />
@@ -334,19 +363,16 @@
           </div>
           <button id="openSettings" class="w-10 h-10 rounded-full bg-white/10 text-xl">⚙️</button>
         </div>
-        
         <div class="flex gap-2 mb-3">
           <input id="searchInput" placeholder="Поиск @username" />
           <button id="searchBtn" class="px-4 rounded-full bg-white/10">🔍</button>
         </div>
         <div id="searchResult" class="text-sm mb-3"></div>
-        
         <p class="text-xs text-gray-400 mb-2">ЧАТЫ</p>
-        <div id="chatList" class="flex-1 overflow-y-auto space-y-1 pr-1"></div>
+        <div id="chatList" class="flex-1 overflow-y-auto space-y-1"></div>
       </div>
       
-      <!-- Окно чата -->
-      <div class="glass-card flex flex-col min-h-0">
+      <div class="glass-card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
         <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
           <div>
             <h3 id="chatTitle" class="font-semibold text-lg">Нет диалога</h3>
@@ -354,9 +380,7 @@
           </div>
           <button id="deleteChatBtn" class="w-10 h-10 rounded-full bg-white/10 hidden">🗑️</button>
         </div>
-        
         <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
-        
         <form id="messageForm" class="p-3 border-t border-white/10 flex gap-2 items-center">
           <input id="messageInput" placeholder="Сообщение..." class="flex-1" />
           <button type="button" id="photoBtn" class="w-10 h-10 rounded-full bg-white/10 text-lg">🖼️</button>
@@ -368,6 +392,60 @@
         </form>
         <input type="file" id="photoInput" accept="image/*" style="display: none;" />
       </div>
+    </div>
+
+    <!-- Мобильный вид -->
+    <div class="mobile-view" style="display: none; height: 100%; flex-direction: column;">
+      <div class="glass-card" style="flex: 1; margin: 12px; display: flex; flex-direction: column; overflow: hidden;">
+        <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img id="mobileMyAvatar" class="w-10 h-10 rounded-full object-cover border-2" style="border-color: var(--accent);" src="" />
+            <div>
+              <h2 class="text-lg font-bold pulsar-title">Pulsar</h2>
+              <p id="mobileMyUsernameLabel" class="text-xs text-gray-400"></p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-3">
+          <div class="flex gap-2">
+            <input id="mobileSearchInput" placeholder="Поиск @username" class="flex-1" />
+            <button id="mobileSearchBtn" class="px-4 rounded-full bg-white/10">🔍</button>
+          </div>
+          <div id="mobileSearchResult" class="text-sm mt-2"></div>
+        </div>
+        
+        <div class="px-3">
+          <p class="text-xs text-gray-400 mb-2">ЧАТЫ</p>
+          <div id="mobileChatList" class="flex-1 overflow-y-auto space-y-1" style="max-height: 40vh;"></div>
+        </div>
+        
+        <div class="flex-1 flex flex-col min-h-0" style="margin-top: auto;">
+          <div class="px-3 py-2 border-t border-b border-white/10">
+            <h3 id="mobileChatTitle" class="font-semibold">Нет диалога</h3>
+            <p id="mobileChatStatus" class="text-xs text-gray-400"></p>
+          </div>
+          <div id="mobileMessages" class="flex-1 overflow-y-auto p-3 space-y-2" style="min-height: 200px;"></div>
+          <form id="mobileMessageForm" class="p-3 border-t border-white/10 flex gap-2 items-center">
+            <input id="mobileMessageInput" placeholder="Сообщение..." class="flex-1" />
+            <button type="button" id="mobilePhotoBtn" class="w-10 h-10 rounded-full bg-white/10 text-lg">🖼️</button>
+            <button type="button" id="mobileVoiceBtn" class="w-10 h-10 rounded-full bg-white/10 text-lg relative">
+              🎙️
+              <span id="mobileRecordingIndicator" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full hidden"></span>
+            </button>
+            <button type="submit" class="w-10 h-10 rounded-full font-bold" style="background: var(--accent);">➤</button>
+          </form>
+          <input type="file" id="mobilePhotoInput" accept="image/*" style="display: none;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Нижняя навигация -->
+    <div class="mobile-nav">
+      <button id="navChatsBtn" class="active">💬</button>
+      <button id="navSearchBtn">🔍</button>
+      <button id="navProfileBtn">👤</button>
+      <button id="navSettingsBtn">⚙️</button>
     </div>
   </div>
 
@@ -386,19 +464,15 @@
             <div class="select-option" data-value="greenblack">GreenBlack</div>
           </div>
         </div>
-        
         <div class="flex items-center justify-between">
           <span>Liquid Glass</span>
           <div id="liquidGlassToggle" class="custom-checkbox"></div>
         </div>
-        
         <div class="flex items-center justify-between">
           <span>Скрыть статус</span>
           <div id="hideStatusToggle" class="custom-checkbox"></div>
         </div>
-        
         <hr class="border-white/10" />
-        
         <div>
           <div class="flex items-center justify-between mb-2">
             <span>Снегопад</span>
@@ -417,7 +491,6 @@
             <input type="range" id="snowSpeed" min="3" max="12" step="1" value="6" class="w-full" />
           </div>
         </div>
-        
         <button id="saveSettingsBtn" class="w-full py-2 rounded-xl font-semibold" style="background: var(--accent);">Сохранить</button>
         <button id="logoutSettingsBtn" class="w-full py-2 rounded-xl font-semibold bg-red-500/20 text-red-400">Выйти</button>
         <p id="settingsInfo" class="text-sm text-center"></p>
@@ -475,6 +548,8 @@
     let audioChunks = [];
     let isRecording = false;
     
+    let mobileMessageUnsub = null;
+    
     function $(id) { return document.getElementById(id); }
     
     function getCheckboxValue(container) {
@@ -498,6 +573,7 @@
     function applyTheme(theme) { 
       document.body.setAttribute("data-theme", theme || "default"); 
       localStorage.setItem("pulsar_theme", theme || "default"); 
+      if($('selectedThemeText')) $('selectedThemeText').textContent = theme === "default" ? "Default" : "GreenBlack";
     }
     
     function applyLiquidGlass(enabled) { 
@@ -621,7 +697,9 @@
       if (!$('authView') || !$('appView')) return; 
       $('authView').classList.add("hidden"); 
       $('appView').classList.remove("hidden"); 
-      updateMyProfileDisplay(); 
+      updateMyProfileDisplay();
+      updateMobileMyProfileDisplay();
+      
       const savedTheme = localStorage.getItem("pulsar_theme") || currentUser?.theme || "default"; 
       applyTheme(savedTheme); 
       const liquidState = localStorage.getItem("pulsar_liquid") === "1"; 
@@ -633,14 +711,22 @@
         usersCache = snap.val() || {}; 
         updateChatsList(); 
         renderChats(); 
-        if (selectedPartner && usersCache[selectedPartner]) renderChatHeader(selectedPartner); 
-        updateMyProfileDisplay(); 
+        renderMobileChats();
+        if (selectedPartner && usersCache[selectedPartner]) {
+          renderChatHeader(selectedPartner);
+          renderMobileChatHeader(selectedPartner);
+        }
+        updateMyProfileDisplay();
+        updateMobileMyProfileDisplay();
       }); 
       
       setInterval(() => { if (currentUser?.uid && db) db.ref(`users/${currentUser.uid}`).update({ last_seen: Date.now() }); }, 30000); 
       await updateChatsList(); 
       renderChats(); 
-      loadSnowSettings(); 
+      renderMobileChats();
+      loadSnowSettings();
+      initMobileNav();
+      checkMobileView();
     }
     
     function updateMyProfileDisplay() { 
@@ -648,6 +734,13 @@
         $('myUsernameLabel').innerText = displayUserIdentifier(currentUser); 
         if ($('myAvatar')) $('myAvatar').src = avatarUrl(currentUser); 
       } 
+    }
+    
+    function updateMobileMyProfileDisplay() {
+      if (currentUser && $('mobileMyUsernameLabel')) {
+        $('mobileMyUsernameLabel').innerText = displayUserIdentifier(currentUser);
+        if ($('mobileMyAvatar')) $('mobileMyAvatar').src = avatarUrl(currentUser);
+      }
     }
     
     async function updateChatsList() { 
@@ -664,7 +757,6 @@
         } 
       } 
       chatsList = Array.from(chatSet); 
-      renderChats();
     }
     
     function renderChats() { 
@@ -694,6 +786,33 @@
       }); 
     }
     
+    function renderMobileChats() {
+      if (!$('mobileChatList')) return;
+      const list = chatsList.filter(uid => uid !== currentUser?.uid && usersCache[uid]);
+      if (list.length === 0) {
+        $('mobileChatList').innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Нет чатов</p>';
+        return;
+      }
+      $('mobileChatList').innerHTML = list.map(uid => {
+        const u = usersCache[uid];
+        if (!u) return '';
+        const isActive = selectedPartner === uid;
+        return `<div data-mobile-chat="${uid}" class="chat-item w-full text-left p-2 ${isActive ? 'chat-item-active' : ''}"><div class="flex gap-3 items-center"><img src="${avatarUrl(u)}" class="w-10 h-10 rounded-full object-cover cursor-pointer" data-mobile-profile="${uid}" /><div class="flex-1"><b>${escapeHtml(getDisplayName(u))}</b><p class="text-xs text-gray-400">${escapeHtml(displayUserIdentifier(u))}</p></div><div class="text-xs">${u.online ? '<span class="text-green-400">●</span>' : '<span class="text-gray-500">○</span>'}</div></div></div>`;
+      }).join("");
+      
+      Array.from($('mobileChatList').querySelectorAll("[data-mobile-chat]")).forEach(el => {
+        el.addEventListener("click", (e) => {
+          if (e.target.tagName === 'IMG') {
+            const uid = e.target.getAttribute('data-mobile-profile');
+            if (uid) openProfile(uid);
+          } else {
+            const uid = el.getAttribute('data-mobile-chat');
+            if (uid) openMobileChat(uid);
+          }
+        });
+      });
+    }
+    
     async function openChat(uid) { 
       if (!uid || uid === selectedPartner) return;
       
@@ -703,7 +822,9 @@
       
       selectedPartner = uid; 
       renderChats(); 
+      renderMobileChats();
       renderChatHeader(uid); 
+      renderMobileChatHeader(uid);
       if ($('deleteChatBtn')) $('deleteChatBtn').classList.remove("hidden"); 
       
       const cid = chatId(currentUser.uid, uid); 
@@ -733,6 +854,11 @@
       }); 
     }
     
+    async function openMobileChat(uid) {
+      await openChat(uid);
+      document.querySelector('#navChatsBtn')?.click();
+    }
+    
     function renderChatHeader(uid) { 
       const u = usersCache[uid]; 
       if (!u || !$('chatTitle')) return; 
@@ -743,6 +869,16 @@
       } 
     }
     
+    function renderMobileChatHeader(uid) {
+      const u = usersCache[uid];
+      if (!u || !$('mobileChatTitle')) return;
+      $('mobileChatTitle').innerText = getDisplayName(u);
+      if ($('mobileChatStatus')) {
+        if (u.hideStatus) $('mobileChatStatus').innerText = "статус скрыт";
+        else $('mobileChatStatus').innerText = u.online ? "онлайн" : `был(а) ${new Date(u.last_seen || Date.now()).toLocaleTimeString()}`;
+      }
+    }
+    
     async function sendMessage(content, type = 'text') { 
       if (!selectedPartner || !db) return; 
       const cid = chatId(currentUser.uid, selectedPartner); 
@@ -750,9 +886,11 @@
       if (!chatsList.includes(selectedPartner)) { 
         chatsList.push(selectedPartner); 
         renderChats(); 
+        renderMobileChats();
       } 
     }
     
+    // Обработчики для десктопа
     if ($('messageForm')) {
       $('messageForm').onsubmit = async (e) => { 
         e.preventDefault(); 
@@ -811,6 +949,66 @@
       };
     }
     
+    // Обработчики для мобильной версии
+    if ($('mobileMessageForm')) {
+      $('mobileMessageForm').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedPartner || !$('mobileMessageInput')?.value.trim() || !db) return;
+        await sendMessage($('mobileMessageInput').value.trim());
+        $('mobileMessageInput').value = "";
+      };
+    }
+    
+    if ($('mobilePhotoBtn')) $('mobilePhotoBtn').onclick = () => $('mobilePhotoInput').click();
+    if ($('mobilePhotoInput')) {
+      $('mobilePhotoInput').onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = async (ev) => { await sendMessage(ev.target.result, 'photo'); };
+          reader.readAsDataURL(file);
+        }
+        $('mobilePhotoInput').value = '';
+      };
+    }
+    
+    if ($('mobileVoiceBtn')) {
+      $('mobileVoiceBtn').onmousedown = async () => {
+        if (isRecording) return;
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = async () => { await sendMessage(reader.result, 'voice'); };
+            stream.getTracks().forEach(track => track.stop());
+          };
+          mediaRecorder.start();
+          isRecording = true;
+          if($('mobileRecordingIndicator')) $('mobileRecordingIndicator').classList.remove('hidden');
+        } catch(err) { console.error("Microphone error:", err); }
+      };
+      $('mobileVoiceBtn').onmouseup = () => {
+        if (mediaRecorder && isRecording) {
+          mediaRecorder.stop();
+          isRecording = false;
+          if($('mobileRecordingIndicator')) $('mobileRecordingIndicator').classList.add('hidden');
+        }
+      };
+      $('mobileVoiceBtn').onmouseleave = () => {
+        if (mediaRecorder && isRecording) {
+          mediaRecorder.stop();
+          isRecording = false;
+          if($('mobileRecordingIndicator')) $('mobileRecordingIndicator').classList.add('hidden');
+        }
+      };
+    }
+    
+    // Поиск
     if ($('searchBtn')) {
       $('searchBtn').onclick = async () => {
         const uname = normalizeUsername($('searchInput')?.value || "");
@@ -822,10 +1020,31 @@
         if ($('searchResult')) {
           $('searchResult').innerHTML = `<button id="foundUserBtn" class="w-full p-2 rounded-xl bg-white/10">${escapeHtml(getDisplayName(u))} — ${escapeHtml(displayUserIdentifier(u))}</button>`;
           document.getElementById("foundUserBtn")?.addEventListener("click", async () => {
-            if (!chatsList.includes(u.uid)) { chatsList.push(u.uid); renderChats(); }
+            if (!chatsList.includes(u.uid)) { chatsList.push(u.uid); renderChats(); renderMobileChats(); }
             openChat(u.uid);
             $('searchInput').value = "";
             $('searchResult').innerHTML = "";
+          });
+        }
+      };
+    }
+    
+    if ($('mobileSearchBtn')) {
+      $('mobileSearchBtn').onclick = async () => {
+        const uname = normalizeUsername($('mobileSearchInput')?.value || "");
+        if (!uname) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "Введите @username"; return; }
+        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
+        if (!snapshot.exists()) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "❌ не найден"; return; }
+        const u = Object.values(snapshot.val())[0];
+        if (u.uid === currentUser.uid) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "Нельзя начать чат с собой"; return; }
+        if ($('mobileSearchResult')) {
+          $('mobileSearchResult').innerHTML = `<button id="mobileFoundUserBtn" class="w-full p-2 rounded-xl bg-white/10">${escapeHtml(getDisplayName(u))} — ${escapeHtml(displayUserIdentifier(u))}</button>`;
+          document.getElementById("mobileFoundUserBtn")?.addEventListener("click", async () => {
+            if (!chatsList.includes(u.uid)) { chatsList.push(u.uid); renderChats(); renderMobileChats(); }
+            openChat(u.uid);
+            $('mobileSearchInput').value = "";
+            $('mobileSearchResult').innerHTML = "";
+            document.querySelector('#navChatsBtn')?.click();
           });
         }
       };
@@ -868,7 +1087,9 @@
       currentUser = { ...currentUser, ...updates };
       localStorage.removeItem("pulsar_temp_avatar");
       updateMyProfileDisplay();
+      updateMobileMyProfileDisplay();
       renderChats();
+      renderMobileChats();
       $('editProfileModal').style.display = "none";
       if ($('settingsInfo')) $('settingsInfo').innerText = "Профиль обновлён";
       setTimeout(() => { if ($('settingsInfo')) $('settingsInfo').innerText = ""; }, 2000);
@@ -888,10 +1109,12 @@
           currentMessageRef = null;
         }
         renderChats();
+        renderMobileChats();
         if ($('messages')) $('messages').innerHTML = "";
+        if ($('mobileMessages')) $('mobileMessages').innerHTML = "";
         selectedPartner = null;
         if ($('chatTitle')) $('chatTitle').innerText = "Нет диалога";
-        if ($('chatStatus')) $('chatStatus').innerText = "";
+        if ($('mobileChatTitle')) $('mobileChatTitle').innerText = "Нет диалога";
         if ($('deleteChatBtn')) $('deleteChatBtn').classList.add("hidden");
         $('deleteChatModal').style.display = "none";
       };
@@ -909,10 +1132,12 @@
           currentMessageRef = null;
         }
         renderChats();
+        renderMobileChats();
         if ($('messages')) $('messages').innerHTML = "";
+        if ($('mobileMessages')) $('mobileMessages').innerHTML = "";
         selectedPartner = null;
         if ($('chatTitle')) $('chatTitle').innerText = "Нет диалога";
-        if ($('chatStatus')) $('chatStatus').innerText = "";
+        if ($('mobileChatTitle')) $('mobileChatTitle').innerText = "Нет диалога";
         if ($('deleteChatBtn')) $('deleteChatBtn').classList.add("hidden");
         $('deleteChatModal').style.display = "none";
       };
@@ -1072,6 +1297,70 @@
         container.classList.toggle('checked');
       });
     }
+    
+    function initMobileNav() {
+      const navChats = $('#navChatsBtn');
+      const navSearch = $('#navSearchBtn');
+      const navProfile = $('#navProfileBtn');
+      const navSettings = $('#navSettingsBtn');
+      
+      const mobileViews = {
+        chats: () => {
+          document.querySelectorAll('.mobile-view > div > div:not(:first-child)').forEach(el => {
+            if (el.id !== 'mobileChatList' && el.id !== 'mobileMessages' && el.parentElement) {
+              if (el.id === 'mobileMessages') el.style.display = 'flex';
+              else if (el.classList.contains('flex-1')) el.style.display = 'flex';
+            }
+          });
+          if ($('mobileMessages')) $('mobileMessages').style.display = 'block';
+        },
+        search: () => {
+          if ($('mobileSearchResult')) $('mobileSearchResult').scrollIntoView({ behavior: 'smooth' });
+        },
+        profile: () => openMyProfile(),
+        settings: () => $('openSettings').click()
+      };
+      
+      navChats?.addEventListener('click', () => {
+        [navChats, navSearch, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
+        navChats.classList.add('active');
+        mobileViews.chats();
+      });
+      navSearch?.addEventListener('click', () => {
+        [navChats, navSearch, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
+        navSearch.classList.add('active');
+        mobileViews.search();
+      });
+      navProfile?.addEventListener('click', () => {
+        [navChats, navSearch, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
+        navProfile.classList.add('active');
+        mobileViews.profile();
+      });
+      navSettings?.addEventListener('click', () => {
+        [navChats, navSearch, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
+        navSettings.classList.add('active');
+        mobileViews.settings();
+      });
+    }
+    
+    function checkMobileView() {
+      const isMobile = window.innerWidth <= 768;
+      const desktopSidebar = document.querySelector('.desktop-sidebar');
+      const mobileView = document.querySelector('.mobile-view');
+      const mobileNav = document.querySelector('.mobile-nav');
+      
+      if (isMobile) {
+        if (desktopSidebar) desktopSidebar.style.display = 'none';
+        if (mobileView) mobileView.style.display = 'flex';
+        if (mobileNav) mobileNav.style.display = 'flex';
+      } else {
+        if (desktopSidebar) desktopSidebar.style.display = 'flex';
+        if (mobileView) mobileView.style.display = 'none';
+        if (mobileNav) mobileNav.style.display = 'none';
+      }
+    }
+    
+    window.addEventListener('resize', checkMobileView);
     
     initCustomSelect();
     initCustomCheckbox($('liquidGlassToggle'), localStorage.getItem("pulsar_liquid") === "1");
