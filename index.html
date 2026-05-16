@@ -3,153 +3,274 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Pulsar — космический мессенджер</title>
+  <title>Pulsar</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     :root {
-      --bg-dark: #0a0a0f;
-      --bg-card: #141122;
-      --glass-bg: rgba(20, 17, 34, 0.7);
-      --accent: #8b5cf6;
-      --accent-glow: #a78bfa;
-      --text: #f0f0ff;
-      --text-muted: #a0a0c0;
-      --border: rgba(139, 92, 246, 0.2);
+      --bg-dark: #000000;
+      --bg-card: #0a0a0f;
+      --accent: #7C3AED;
+      --accent-glow: #A855F7;
+      --text: #FFFFFF;
+      --text-muted: #9CA3AF;
+      --border: rgba(124, 58, 237, 0.4);
+      --border-light: rgba(124, 58, 237, 0.2);
+      --msg-mine: rgba(124, 58, 237, 0.85);
+      --msg-theirs: rgba(30, 30, 40, 0.8);
+      --glow-color: rgba(124, 58, 237, 0.3);
+    }
+
+    [data-theme="default"] {
+      --bg-dark: #000000;
+      --bg-card: #0a0a0f;
+      --accent: #7C3AED;
+      --accent-glow: #A855F7;
+      --border: rgba(124, 58, 237, 0.4);
+      --border-light: rgba(124, 58, 237, 0.2);
+      --msg-mine: rgba(124, 58, 237, 0.85);
+      --msg-theirs: rgba(30, 30, 40, 0.8);
+      --glow-color: rgba(124, 58, 237, 0.3);
     }
     
-    [data-theme="aurora"] { --accent: #8b5cf6; --accent-glow: #a78bfa; --bg-card: #141122; }
-    [data-theme="dusk"] { --accent: #f59e0b; --accent-glow: #fbbf24; --bg-card: #1a1a2e; }
-    [data-theme="ember"] { --accent: #ef4444; --accent-glow: #f87171; --bg-card: #2d1a1a; }
-    
+    [data-theme="greenblack"] {
+      --bg-dark: #000000;
+      --bg-card: #0a1a0a;
+      --accent: #10B981;
+      --accent-glow: #34D399;
+      --border: rgba(16, 185, 129, 0.4);
+      --border-light: rgba(16, 185, 129, 0.2);
+      --msg-mine: rgba(16, 185, 129, 0.85);
+      --msg-theirs: rgba(30, 35, 30, 0.8);
+      --glow-color: rgba(16, 185, 129, 0.3);
+    }
+
     body {
-      background: linear-gradient(135deg, #0a0a0f 0%, #1a0f2e 50%, #0a0a0f 100%);
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-card) 50%, var(--bg-dark) 100%);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       color: var(--text);
       min-height: 100vh;
+      transition: background 0.3s ease;
     }
     
     body.liquid-glass .glass-card {
       backdrop-filter: blur(20px);
-      background: rgba(20, 17, 34, 0.4);
-      border: 1px solid rgba(139, 92, 246, 0.3);
-    }
-    
-    .glass-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(10px);
-      border-radius: 28px;
+      background: rgba(10, 10, 15, 0.55);
       border: 1px solid var(--border);
     }
+
+    .glass-card {
+      background: var(--bg-card);
+      border-radius: 28px;
+      border: 1px solid var(--border-light);
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px var(--glow-color);
+    }
     
-    .gradient-text {
-      background: linear-gradient(135deg, #fff, var(--accent));
+    .glass-card:hover {
+      box-shadow: 0 0 30px var(--glow-color);
+    }
+
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    .pulsar-title {
+      background: linear-gradient(90deg, #FFFFFF 0%, var(--accent) 50%, var(--accent-glow) 100%);
+      background-size: 200% auto;
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      animation: gradient-shift 2.5s ease infinite alternate;
     }
-    
+
     .message-bubble {
       max-width: 80%;
       padding: 10px 14px;
       border-radius: 20px;
       word-break: break-word;
-      animation: fadeSlideUp 0.25s ease-out;
+      animation: fadeSlideUp 0.2s ease-out;
     }
-    
     @keyframes fadeSlideUp {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+
     .chat-item {
       transition: all 0.2s ease;
       border-radius: 16px;
+      cursor: pointer;
     }
-    .chat-item:hover { background: rgba(139, 92, 246, 0.15); transform: translateX(4px); }
-    .chat-item-active { background: rgba(139, 92, 246, 0.25); }
-    
+    .chat-item:hover { background: rgba(124, 58, 237, 0.15); transform: translateX(4px); box-shadow: 0 0 10px var(--glow-color); }
+    .chat-item-active { background: rgba(124, 58, 237, 0.25); border-left: 3px solid var(--accent); box-shadow: 0 0 15px var(--glow-color); }
+
     .snow-flake {
       position: fixed;
       pointer-events: none;
       background: white;
       border-radius: 50%;
-      opacity: 0.6;
+      opacity: 0.35;
       z-index: 9999;
       animation: fall linear forwards;
     }
-    
     @keyframes fall {
-      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.6; }
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.35; }
       100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
-    
-    ::-webkit-scrollbar { width: 5px; }
+
+    ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-    
-    button { cursor: pointer; transition: all 0.15s ease; }
+
+    button { cursor: pointer; transition: all 0.15s ease; background: none; border: none; }
     button:active { transform: scale(0.97); }
     
-    input, textarea, select {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border);
+    input, textarea {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-light);
       border-radius: 20px;
       padding: 12px 16px;
       color: var(--text);
       outline: none;
       transition: all 0.2s;
+      width: 100%;
     }
-    input:focus, textarea:focus, select:focus {
+    input:focus, textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
     }
+    
+    audio {
+      height: 40px;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.3);
+    }
+    img.photo-message {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 16px;
+      cursor: pointer;
+    }
+
+    .custom-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .custom-checkbox.checked {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    .custom-checkbox.checked::after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .custom-select {
+      position: relative;
+      width: 100%;
+    }
+    .select-trigger {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 12px 16px;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .select-trigger:hover {
+      border-color: var(--accent);
+    }
+    .select-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      margin-top: 8px;
+      overflow: hidden;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.25s ease;
+    }
+    .select-dropdown.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .select-option {
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+    .select-option:hover {
+      background: rgba(124, 58, 237, 0.2);
+    }
+    
+    .modal-enter {
+      animation: modalFadeIn 0.25s ease;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .hidden { display: none; }
   </style>
 </head>
-<body data-theme="aurora">
-  <div id="snowContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 9999;"></div>
+<body data-theme="default">
+  <div id="snowContainer"></div>
 
   <!-- АВТОРИЗАЦИЯ -->
-  <div id="authView" class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-5xl grid md:grid-cols-2 gap-5">
-      <div class="glass-card p-8 flex flex-col justify-between min-h-[500px]">
-        <div>
-          <h1 class="text-5xl font-bold gradient-text">Pulsar</h1>
-          <p class="mt-4 text-gray-300 text-lg">Мессенджер в реальном времени с космическим стилем</p>
-        </div>
-        <div class="mt-8">
-          <div class="w-16 h-16 rounded-full bg-[var(--accent)]/20 flex items-center justify-center">
-            <span class="text-3xl">✨</span>
-          </div>
-        </div>
+  <div id="authView" class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-md text-center mb-10">
+      <h1 class="text-6xl md:text-7xl font-bold pulsar-title tracking-tight">Pulsar</h1>
+    </div>
+    <div class="glass-card w-full max-w-md p-6">
+      <div class="flex gap-2 mb-6">
+        <button id="loginTab" class="flex-1 py-2 rounded-full font-medium bg-white/5">Вход</button>
+        <button id="registerTab" class="flex-1 py-2 rounded-full font-medium">Регистрация</button>
       </div>
-      <div class="glass-card p-6">
-        <div class="flex gap-2 mb-5">
-          <button id="loginTab" class="flex-1 py-2 rounded-full bg-white/10 font-medium">Вход</button>
-          <button id="registerTab" class="flex-1 py-2 rounded-full font-medium">Регистрация</button>
-        </div>
-        <form id="loginForm" class="space-y-4">
-          <input id="loginUsername" placeholder="@username" class="w-full" />
-          <input id="loginPassword" type="password" placeholder="Пароль" class="w-full" />
-          <button type="submit" class="w-full py-3 rounded-full font-semibold" style="background: var(--accent); color: white;">Войти</button>
-        </form>
-        <form id="registerForm" class="space-y-4 hidden">
-          <input id="regUsername" placeholder="@username" class="w-full" />
-          <input id="regNickname" placeholder="Nickname" class="w-full" />
-          <input id="regPassword" type="password" placeholder="Пароль" class="w-full" />
-          <button type="submit" class="w-full py-3 rounded-full font-semibold" style="background: var(--accent); color: white;">Создать</button>
-        </form>
-        <button id="diagnosticBtn" class="mt-4 text-sm text-gray-400 underline w-full">Диагностика</button>
-        <p id="authError" class="mt-3 text-sm text-red-400 text-center"></p>
-      </div>
+      <form id="loginForm" class="space-y-4">
+        <input id="loginUsername" placeholder="@username" />
+        <input id="loginPassword" type="password" placeholder="Пароль" />
+        <button type="submit" class="w-full py-3 rounded-full font-semibold" style="background: var(--accent); color: white;">Войти</button>
+      </form>
+      <form id="registerForm" class="space-y-4 hidden">
+        <input id="regUsername" placeholder="@username" />
+        <input id="regNickname" placeholder="Nickname" />
+        <input id="regPassword" type="password" placeholder="Пароль" />
+        <button type="submit" class="w-full py-3 rounded-full font-semibold" style="background: var(--accent); color: white;">Создать</button>
+      </form>
+      <p id="authError" class="mt-4 text-sm text-red-400 text-center"></p>
     </div>
   </div>
 
-  <!-- ПРОФИЛЬ (модалка) -->
-  <div id="profileModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-50">
+  <!-- ПРОФИЛЬ МОДАЛКА -->
+  <div id="profileModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-50">
     <div class="glass-card w-full max-w-md p-6 text-center">
-      <img id="profileAvatar" class="w-24 h-24 rounded-full mx-auto object-cover border-3" style="border-color: var(--accent);" src="" />
+      <img id="profileAvatar" class="w-24 h-24 rounded-full mx-auto object-cover border-2" style="border-color: var(--accent);" src="" />
       <h3 id="profileNick" class="text-xl font-bold mt-3"></h3>
       <p id="profileUsername" class="text-gray-400 text-sm mt-1"></p>
       <div id="profileNftBlock" class="mt-3 p-3 rounded-xl bg-white/5 hidden">
@@ -165,31 +286,40 @@
   </div>
 
   <!-- РЕДАКТИРОВАНИЕ ПРОФИЛЯ -->
-  <div id="editProfileModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-50">
+  <div id="editProfileModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-50">
     <div class="glass-card w-full max-w-md p-6">
       <h3 class="text-xl font-semibold text-center mb-4">Редактировать</h3>
       <div class="text-center mb-4">
         <img id="editAvatarPreview" class="w-20 h-20 rounded-full mx-auto object-cover border-2" style="border-color: var(--accent);" src="" />
-        <input type="file" id="avatarFile" accept="image/*" class="mt-2 text-sm" />
+        <input type="file" id="avatarFile" accept="image/*" class="mt-2 text-sm bg-transparent" />
       </div>
-      <input id="editNickname" placeholder="Nickname" class="w-full mb-3" />
-      <input id="editUsername" placeholder="@username" class="w-full mb-3" />
+      <input id="editNickname" placeholder="Nickname" class="mb-3" />
+      <input id="editUsername" placeholder="@username" class="mb-3" />
       <button id="saveProfileBtn" class="w-full py-2 rounded-xl font-semibold mb-2" style="background: var(--accent);">Сохранить</button>
       <button id="closeEditProfile" class="w-full py-2 rounded-xl bg-white/10">Отмена</button>
     </div>
   </div>
 
   <!-- УДАЛЕНИЕ ЧАТА -->
-  <div id="deleteChatModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-50">
+  <div id="deleteChatModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-50">
     <div class="glass-card w-full max-w-sm p-6 text-center">
       <h3 class="text-xl font-semibold mb-3">Удалить чат?</h3>
-      <button id="deleteForMeBtn" class="w-full py-2 rounded-xl bg-white/10 mb-2">🗑️ Только у меня</button>
-      <button id="deleteForBothBtn" class="w-full py-2 rounded-xl bg-red-500/20 mb-2 text-red-400">⚠️ У всех</button>
+      <button id="deleteForMeBtn" class="w-full py-2 rounded-xl bg-white/10 mb-2">Только у меня</button>
+      <button id="deleteForBothBtn" class="w-full py-2 rounded-xl bg-red-500/20 mb-2 text-red-400">У всех</button>
       <button id="cancelDeleteBtn" class="w-full py-2 rounded-xl" style="background: var(--accent);">Отмена</button>
     </div>
   </div>
 
-  <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+  <!-- ПОДТВЕРЖДЕНИЕ ВЫХОДА -->
+  <div id="confirmLogoutModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="glass-card w-full max-w-sm p-6 text-center">
+      <h3 class="text-xl font-semibold mb-3">Выйти из аккаунта?</h3>
+      <button id="confirmLogoutBtn" class="w-full py-2 rounded-xl bg-red-500/20 mb-2 text-red-400">Выйти</button>
+      <button id="cancelLogoutBtn" class="w-full py-2 rounded-xl" style="background: var(--accent);">Отмена</button>
+    </div>
+  </div>
+
+  <!-- ГЛАВНОЕ ПРИЛОЖЕНИЕ -->
   <div id="appView" class="hidden h-screen p-3">
     <div class="h-full grid md:grid-cols-[320px_1fr] gap-3">
       <!-- Боковая панель -->
@@ -198,7 +328,7 @@
           <div class="flex items-center gap-3 cursor-pointer" id="myProfileBtn">
             <img id="myAvatar" class="w-12 h-12 rounded-full object-cover border-2" style="border-color: var(--accent);" src="" />
             <div>
-              <h2 class="text-xl font-bold gradient-text">Pulsar</h2>
+              <h2 class="text-xl font-bold pulsar-title">Pulsar</h2>
               <p id="myUsernameLabel" class="text-sm text-gray-400"></p>
             </div>
           </div>
@@ -206,18 +336,16 @@
         </div>
         
         <div class="flex gap-2 mb-3">
-          <input id="searchInput" placeholder="Поиск @username" class="flex-1" />
+          <input id="searchInput" placeholder="Поиск @username" />
           <button id="searchBtn" class="px-4 rounded-full bg-white/10">🔍</button>
         </div>
         <div id="searchResult" class="text-sm mb-3"></div>
         
-        <p class="text-xs text-gray-400 mb-2">📩 ЧАТЫ</p>
+        <p class="text-xs text-gray-400 mb-2">ЧАТЫ</p>
         <div id="chatList" class="flex-1 overflow-y-auto space-y-1 pr-1"></div>
-        
-        <button id="logoutBtn" class="mt-3 py-2 rounded-xl bg-white/10">🚪 Выйти</button>
       </div>
       
-      <!-- Чат -->
+      <!-- Окно чата -->
       <div class="glass-card flex flex-col min-h-0">
         <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
           <div>
@@ -229,34 +357,69 @@
         
         <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
         
-        <form id="messageForm" class="p-3 border-t border-white/10 flex gap-2">
+        <form id="messageForm" class="p-3 border-t border-white/10 flex gap-2 items-center">
           <input id="messageInput" placeholder="Сообщение..." class="flex-1" />
-          <button class="px-5 rounded-full font-bold" style="background: var(--accent);">➤</button>
+          <button type="button" id="photoBtn" class="w-10 h-10 rounded-full bg-white/10 text-lg">🖼️</button>
+          <button type="button" id="voiceBtn" class="w-10 h-10 rounded-full bg-white/10 text-lg relative">
+            🎙️
+            <span id="recordingIndicator" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full hidden"></span>
+          </button>
+          <button type="submit" class="w-10 h-10 rounded-full font-bold" style="background: var(--accent);">➤</button>
         </form>
+        <input type="file" id="photoInput" accept="image/*" style="display: none;" />
       </div>
     </div>
   </div>
 
   <!-- НАСТРОЙКИ -->
-  <div id="settingsModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-40">
+  <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-40">
     <div class="glass-card w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between mb-4"><h3 class="text-xl font-semibold">Настройки</h3><button id="closeSettings" class="w-8 h-8 rounded-full bg-white/10">✕</button></div>
       <div class="space-y-4">
-        <select id="themeSelect" class="w-full">
-          <option value="aurora">🌌 Aurora</option>
-          <option value="dusk">🌆 Dusk</option>
-          <option value="ember">🔥 Ember</option>
-        </select>
-        <label class="flex items-center gap-2"><input type="checkbox" id="liquidGlassToggle" /> Liquid Glass</label>
-        <label class="flex items-center gap-2"><input type="checkbox" id="hideStatusInput" /> Скрыть статус</label>
-        <hr class="border-white/20" />
-        <div>
-          <label class="flex items-center gap-2"><input type="checkbox" id="snowEnabled" /> ❄️ Снегопад</label>
-          <div class="mt-2">Количество: <input type="range" id="snowCount" min="0" max="150" value="40" /><span id="snowCountVal">40</span></div>
-          <div>Размер: <input type="range" id="snowSize" min="2" max="10" value="4" /><span id="snowSizeVal">4</span>px</div>
-          <div>Скорость: <input type="range" id="snowSpeed" min="3" max="12" value="6" /><span id="snowSpeedVal">6</span>c</div>
+        <div class="custom-select" id="themeSelectContainer">
+          <div class="select-trigger" id="themeSelectTrigger">
+            <span id="selectedThemeText">Default</span>
+            <span>▼</span>
+          </div>
+          <div class="select-dropdown" id="themeSelectDropdown">
+            <div class="select-option" data-value="default">Default</div>
+            <div class="select-option" data-value="greenblack">GreenBlack</div>
+          </div>
         </div>
+        
+        <div class="flex items-center justify-between">
+          <span>Liquid Glass</span>
+          <div id="liquidGlassToggle" class="custom-checkbox"></div>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <span>Скрыть статус</span>
+          <div id="hideStatusToggle" class="custom-checkbox"></div>
+        </div>
+        
+        <hr class="border-white/10" />
+        
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span>Снегопад</span>
+            <div id="snowToggle" class="custom-checkbox"></div>
+          </div>
+          <div class="mt-3">
+            <div class="flex justify-between text-sm mb-1">Количество: <span id="snowCountVal">40</span></div>
+            <input type="range" id="snowCount" min="0" max="150" value="40" class="w-full" />
+          </div>
+          <div class="mt-3">
+            <div class="flex justify-between text-sm mb-1">Размер: <span id="snowSizeVal">4</span> px</div>
+            <input type="range" id="snowSize" min="2" max="10" step="1" value="4" class="w-full" />
+          </div>
+          <div class="mt-3">
+            <div class="flex justify-between text-sm mb-1">Скорость: <span id="snowSpeedVal">6</span> сек</div>
+            <input type="range" id="snowSpeed" min="3" max="12" step="1" value="6" class="w-full" />
+          </div>
+        </div>
+        
         <button id="saveSettingsBtn" class="w-full py-2 rounded-xl font-semibold" style="background: var(--accent);">Сохранить</button>
+        <button id="logoutSettingsBtn" class="w-full py-2 rounded-xl font-semibold bg-red-500/20 text-red-400">Выйти</button>
         <p id="settingsInfo" class="text-sm text-center"></p>
         <div class="text-center pt-2"><button id="adminTrigger" class="text-sm text-gray-400">*</button></div>
       </div>
@@ -264,13 +427,13 @@
   </div>
 
   <!-- АДМИНКА -->
-  <div id="adminModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center p-4 z-45">
+  <div id="adminModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center p-4 z-45">
     <div class="glass-card w-full max-w-md p-6">
       <h3 class="text-xl font-semibold mb-3">Админ-панель</h3>
-      <input id="adminUsername" placeholder="@username" class="w-full mb-3" />
-      <input id="nftUsernameInput" placeholder="NFT @username" class="w-full mb-2" />
+      <input id="adminUsername" placeholder="@username" class="mb-3" />
+      <input id="nftUsernameInput" placeholder="NFT @username" class="mb-2" />
       <button id="grantNftBtn" class="w-full py-2 rounded-xl bg-white/10 mb-3">Выдать NFT @</button>
-      <input id="manualAnonNumber" placeholder="+888123456" class="w-full mb-2" />
+      <input id="manualAnonNumber" placeholder="+888123456" class="mb-2" />
       <button id="setManualAnonBtn" class="w-full py-2 rounded-xl bg-white/10 mb-3">Установить номер</button>
       <button id="closeAdmin" class="w-full py-2 rounded-xl" style="background: var(--accent);">Закрыть</button>
       <p id="adminInfo" class="text-sm mt-2"></p>
@@ -281,7 +444,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
   
   <script>
-    // ========== FIREBASE ==========
     const firebaseConfig = {
       apiKey: "AIzaSyCFSUOzWtlK4ldRTSEjPRdWjiL_8s-YQf4",
       authDomain: "pulsarmess.firebaseapp.com",
@@ -297,53 +459,28 @@
       if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
-        console.log("✅ Firebase connected");
+        console.log("Firebase ready");
       }
-    } catch(e) { console.error("Firebase error:", e); }
+    } catch(e) { console.error(e); }
     
-    // ========== ПЕРЕМЕННЫЕ ==========
     let currentUser = null;
     let usersCache = {};
     let chatsList = [];
     let selectedPartner = null;
-    let messageUnsub = null;
+    let currentMessageRef = null;
     let adminClicks = 0;
     let snowInterval = null;
     
-    // DOM элементы
-    const $ = (id) => document.getElementById(id);
-    const elements = {
-      authView: $('authView'), appView: $('appView'),
-      loginTab: $('loginTab'), registerTab: $('registerTab'),
-      loginForm: $('loginForm'), registerForm: $('registerForm'), authError: $('authError'),
-      loginUsername: $('loginUsername'), loginPassword: $('loginPassword'),
-      regUsername: $('regUsername'), regNickname: $('regNickname'), regPassword: $('regPassword'),
-      myUsernameLabel: $('myUsernameLabel'), myAvatar: $('myAvatar'),
-      searchInput: $('searchInput'), searchBtn: $('searchBtn'), searchResult: $('searchResult'),
-      chatList: $('chatList'), logoutBtn: $('logoutBtn'),
-      chatTitle: $('chatTitle'), chatStatus: $('chatStatus'), messages: $('messages'),
-      messageForm: $('messageForm'), messageInput: $('messageInput'),
-      openSettings: $('openSettings'), closeSettings: $('closeSettings'), settingsModal: $('settingsModal'),
-      hideStatusInput: $('hideStatusInput'), themeSelect: $('themeSelect'), saveSettingsBtn: $('saveSettingsBtn'), settingsInfo: $('settingsInfo'),
-      deleteChatBtn: $('deleteChatBtn'),
-      adminTrigger: $('adminTrigger'), adminModal: $('adminModal'), closeAdmin: $('closeAdmin'),
-      adminUsername: $('adminUsername'), grantNftBtn: $('grantNftBtn'), adminInfo: $('adminInfo'),
-      manualAnonNumber: $('manualAnonNumber'), setManualAnonBtn: $('setManualAnonBtn'),
-      nftUsernameInput: $('nftUsernameInput'),
-      avatarFile: $('avatarFile'), liquidGlassToggle: $('liquidGlassToggle'),
-      snowEnabled: $('snowEnabled'), snowCount: $('snowCount'), snowSize: $('snowSize'), snowSpeed: $('snowSpeed'),
-      snowCountVal: $('snowCountVal'), snowSizeVal: $('snowSizeVal'), snowSpeedVal: $('snowSpeedVal'),
-      diagnosticBtn: $('diagnosticBtn'),
-      profileModal: $('profileModal'), closeProfile: $('closeProfile'),
-      profileAvatar: $('profileAvatar'), profileNick: $('profileNick'), profileUsername: $('profileUsername'),
-      profileNft: $('profileNft'), profileAnon: $('profileAnon'), profileNftBlock: $('profileNftBlock'), profileAnonBlock: $('profileAnonBlock'),
-      editProfileModal: $('editProfileModal'), closeEditProfile: $('closeEditProfile'),
-      editAvatarPreview: $('editAvatarPreview'), editNickname: $('editNickname'), editUsername: $('editUsername'), saveProfileBtn: $('saveProfileBtn'),
-      myProfileBtn: $('myProfileBtn'),
-      deleteChatModal: $('deleteChatModal'), deleteForMeBtn: $('deleteForMeBtn'), deleteForBothBtn: $('deleteForBothBtn'), cancelDeleteBtn: $('cancelDeleteBtn'), deleteInfo: $('deleteInfo')
-    };
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
     
-    // ========== HELPERS ==========
+    function $(id) { return document.getElementById(id); }
+    
+    function getCheckboxValue(container) {
+      return container?.classList.contains('checked') || false;
+    }
+    
     function normalizeUsername(raw) {
       let s = String(raw || "").trim();
       if (!s) return "";
@@ -351,347 +488,379 @@
       return s.toLowerCase();
     }
     
-    function displayUserIdentifier(u) {
-      if (u?.nftUsername && u.nftUsername.trim()) return u.nftUsername;
-      return u?.username || "@unknown";
-    }
-    
-    function getDisplayName(u) {
-      let name = u?.nickname || "User";
-      if (u?.nftUsername) name += " ✨";
-      return name;
-    }
-    
-    function avatarUrl(u) {
-      return u?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u?.nickname || "U")}&background=8b5cf6&color=fff&bold=true&size=128`;
-    }
-    
+    function displayUserIdentifier(u) { return u?.nftUsername?.trim() || u?.username || "@unknown"; }
+    function getDisplayName(u) { return u?.nickname + (u?.nftUsername ? " ✨" : "") || "User"; }
+    function avatarUrl(u) { return u?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u?.nickname || "U")}&background=7C3AED&color=fff&bold=true&size=128`; }
     function chatId(a, b) { return [a, b].sort().join("__"); }
     function escapeHtml(str) { if (!str) return ""; return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
     function showError(el, msg) { if (el) { el.innerHTML = msg; setTimeout(() => { if (el.innerHTML === msg) el.innerHTML = ""; }, 4000); } }
     
-    // ========== ТЕМЫ ==========
-    function applyTheme(theme) {
-      document.body.setAttribute("data-theme", theme || "aurora");
-      localStorage.setItem("pulsar_theme", theme || "aurora");
-      if (elements.themeSelect) elements.themeSelect.value = theme || "aurora";
+    function applyTheme(theme) { 
+      document.body.setAttribute("data-theme", theme || "default"); 
+      localStorage.setItem("pulsar_theme", theme || "default"); 
     }
     
-    function applyLiquidGlass(enabled) {
-      if (enabled) document.body.classList.add("liquid-glass");
-      else document.body.classList.remove("liquid-glass");
-      localStorage.setItem("pulsar_liquid", enabled ? "1" : "0");
+    function applyLiquidGlass(enabled) { 
+      if (enabled) document.body.classList.add("liquid-glass"); 
+      else document.body.classList.remove("liquid-glass"); 
+      localStorage.setItem("pulsar_liquid", enabled ? "1" : "0"); 
     }
     
-    // ========== СНЕГОПАД ==========
+    function saveSnowSettings() {
+      localStorage.setItem("pulsar_snow_enabled", getCheckboxValue($('snowToggle')) ? "1" : "0");
+      localStorage.setItem("pulsar_snow_count", $('snowCount')?.value || "40");
+      localStorage.setItem("pulsar_snow_size", $('snowSize')?.value || "4");
+      localStorage.setItem("pulsar_snow_speed", $('snowSpeed')?.value || "6");
+    }
+    
+    function loadSnowSettings() {
+      const snowToggle = $('snowToggle');
+      if (!snowToggle) return;
+      const enabled = localStorage.getItem("pulsar_snow_enabled") === "1";
+      const count = localStorage.getItem("pulsar_snow_count") || "40";
+      const size = localStorage.getItem("pulsar_snow_size") || "4";
+      const speed = localStorage.getItem("pulsar_snow_speed") || "6";
+      if (enabled) snowToggle.classList.add('checked'); else snowToggle.classList.remove('checked');
+      if ($('snowCount')) $('snowCount').value = count;
+      if ($('snowSize')) $('snowSize').value = size;
+      if ($('snowSpeed')) $('snowSpeed').value = speed;
+      if ($('snowCountVal')) $('snowCountVal').innerText = count;
+      if ($('snowSizeVal')) $('snowSizeVal').innerText = size;
+      if ($('snowSpeedVal')) $('snowSpeedVal').innerText = speed;
+      if (enabled) reloadSnow();
+      else stopSnow();
+    }
+    
     function startSnow(count, size, speedSec) {
-      const container = $('snowContainer');
-      if (!container) return;
+      const container = $('snowContainer'); if (!container) return;
       if (snowInterval) clearInterval(snowInterval);
-      
-      function createFlake() {
-        if (!elements.snowEnabled?.checked) return;
-        const flake = document.createElement("div");
-        flake.classList.add("snow-flake");
-        const sz = size + Math.random() * 4;
-        flake.style.width = sz + "px";
-        flake.style.height = sz + "px";
-        flake.style.left = Math.random() * 100 + "%";
-        const duration = speedSec + Math.random() * 5;
-        flake.style.animationDuration = duration + "s";
-        container.appendChild(flake);
-        setTimeout(() => flake.remove(), duration * 1000);
+      function createFlake() { 
+        if (!getCheckboxValue($('snowToggle'))) return; 
+        const flake = document.createElement("div"); 
+        flake.classList.add("snow-flake"); 
+        const sz = size + Math.random() * 4; 
+        flake.style.width = sz + "px"; 
+        flake.style.height = sz + "px"; 
+        flake.style.left = Math.random() * 100 + "%"; 
+        const duration = speedSec + Math.random() * 5; 
+        flake.style.animationDuration = duration + "s"; 
+        container.appendChild(flake); 
+        setTimeout(() => flake.remove(), duration * 1000); 
       }
-      
-      const intervalTime = Math.max(100, Math.min(500, 3000 / Math.max(count, 1)));
+      const intervalTime = Math.max(100, Math.min(500, 3000 / Math.max(count, 1))); 
       snowInterval = setInterval(createFlake, intervalTime);
     }
     
-    function stopSnow() { if (snowInterval) { clearInterval(snowInterval); snowInterval = null; } const c = $('snowContainer'); if (c) c.innerHTML = ""; }
-    function reloadSnow() {
-      if (elements.snowEnabled?.checked) {
-        stopSnow();
-        startSnow(parseInt(elements.snowCount?.value || 40), parseInt(elements.snowSize?.value || 4), parseInt(elements.snowSpeed?.value || 6));
-      } else { stopSnow(); }
+    function stopSnow() { 
+      if (snowInterval) { clearInterval(snowInterval); snowInterval = null; } 
+      const c = $('snowContainer'); 
+      if (c) c.innerHTML = ""; 
     }
     
-    // ========== АВАТАР ==========
-    if (elements.avatarFile) {
-      elements.avatarFile.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file && file.type.startsWith("image/")) {
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            const b64 = ev.target.result;
-            if (elements.editAvatarPreview) elements.editAvatarPreview.src = b64;
-            localStorage.setItem("pulsar_temp_avatar", b64);
-          };
-          reader.readAsDataURL(file);
-        }
+    function reloadSnow() { 
+      if (getCheckboxValue($('snowToggle'))) { 
+        stopSnow(); 
+        startSnow(parseInt($('snowCount')?.value || 40), parseInt($('snowSize')?.value || 4), parseInt($('snowSpeed')?.value || 6)); 
+      } else { 
+        stopSnow(); 
+      } 
+    }
+    
+    if ($('avatarFile')) {
+      $('avatarFile').addEventListener("change", (e) => { 
+        const file = e.target.files[0]; 
+        if (file && file.type.startsWith("image/")) { 
+          const reader = new FileReader(); 
+          reader.onload = (ev) => { 
+            const b64 = ev.target.result; 
+            if ($('editAvatarPreview')) $('editAvatarPreview').src = b64; 
+            localStorage.setItem("pulsar_temp_avatar", b64); 
+          }; 
+          reader.readAsDataURL(file); 
+        } 
       });
     }
     
-    // ========== РЕГИСТРАЦИЯ ==========
-    async function registerUser(e) {
-      e.preventDefault();
-      if (!db) { showError(elements.authError, "❌ Firebase не подключён"); return; }
-      const username = normalizeUsername(elements.regUsername?.value || "");
-      const nickname = elements.regNickname?.value?.trim() || "";
-      const password = elements.regPassword?.value || "";
-      if (!username || !nickname || !password) { showError(elements.authError, "Заполните все поля"); return; }
-      try {
-        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(username).get();
-        if (snapshot.exists()) { showError(elements.authError, "@ уже занят"); return; }
-        const uid = db.ref("users").push().key;
-        const user = {
-          uid, username, username_lc: username, nickname, password,
-          avatar: "", hideStatus: false, nftUsername: "", anonNumber: "",
-          online: true, last_seen: Date.now(), created_at: Date.now()
-        };
-        await db.ref(`users/${uid}`).set(user);
-        localStorage.setItem("pulsar_uid", uid);
-        currentUser = user;
-        await enterApp();
-      } catch (err) { showError(elements.authError, err.message); }
+    async function registerUser(e) { 
+      e.preventDefault(); 
+      if (!db) { showError($('authError'), "Firebase не подключён"); return; } 
+      const username = normalizeUsername($('regUsername')?.value || ""); 
+      const nickname = $('regNickname')?.value?.trim() || ""; 
+      const password = $('regPassword')?.value || ""; 
+      if (!username || !nickname || !password) { showError($('authError'), "Заполните все поля"); return; } 
+      try { 
+        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(username).get(); 
+        if (snapshot.exists()) { showError($('authError'), "@ уже занят"); return; } 
+        const uid = db.ref("users").push().key; 
+        const user = { uid, username, username_lc: username, nickname, password, avatar: "", hideStatus: false, nftUsername: "", anonNumber: "", online: true, last_seen: Date.now(), created_at: Date.now(), theme: "default" }; 
+        await db.ref(`users/${uid}`).set(user); 
+        localStorage.setItem("pulsar_uid", uid); 
+        currentUser = user; 
+        await enterApp(); 
+      } catch(err) { showError($('authError'), err.message); } 
     }
     
-    // ========== ВХОД ==========
-    async function loginUser(e) {
-      e.preventDefault();
-      if (!db) { showError(elements.authError, "❌ Firebase не подключён"); return; }
-      const uname = normalizeUsername(elements.loginUsername?.value || "");
-      const pass = elements.loginPassword?.value || "";
-      try {
-        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { showError(elements.authError, "Пользователь не найден"); return; }
-        const user = Object.values(snapshot.val())[0];
-        if (user.password !== pass) { showError(elements.authError, "Неверный пароль"); return; }
-        localStorage.setItem("pulsar_uid", user.uid);
-        currentUser = user;
-        await db.ref(`users/${user.uid}`).update({ online: true, last_seen: Date.now() });
-        await enterApp();
-      } catch (err) { showError(elements.authError, err.message); }
+    async function loginUser(e) { 
+      e.preventDefault(); 
+      if (!db) { showError($('authError'), "Firebase не подключён"); return; } 
+      const uname = normalizeUsername($('loginUsername')?.value || ""); 
+      const pass = $('loginPassword')?.value || ""; 
+      try { 
+        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get(); 
+        if (!snapshot.exists()) { showError($('authError'), "Пользователь не найден"); return; } 
+        const user = Object.values(snapshot.val())[0]; 
+        if (user.password !== pass) { showError($('authError'), "Неверный пароль"); return; } 
+        localStorage.setItem("pulsar_uid", user.uid); 
+        currentUser = user; 
+        await db.ref(`users/${user.uid}`).update({ online: true, last_seen: Date.now() }); 
+        await enterApp(); 
+      } catch(err) { showError($('authError'), err.message); } 
     }
     
-    // ========== ОСНОВНОЕ ПРИЛОЖЕНИЕ ==========
-    async function enterApp() {
-      if (!elements.authView || !elements.appView) return;
-      elements.authView.classList.add("hidden");
-      elements.appView.classList.remove("hidden");
-      updateMyProfileDisplay();
+    async function enterApp() { 
+      if (!$('authView') || !$('appView')) return; 
+      $('authView').classList.add("hidden"); 
+      $('appView').classList.remove("hidden"); 
+      updateMyProfileDisplay(); 
+      const savedTheme = localStorage.getItem("pulsar_theme") || currentUser?.theme || "default"; 
+      applyTheme(savedTheme); 
+      const liquidState = localStorage.getItem("pulsar_liquid") === "1"; 
+      applyLiquidGlass(liquidState); 
+      if($('liquidGlassToggle')) { if(liquidState) $('liquidGlassToggle').classList.add('checked'); else $('liquidGlassToggle').classList.remove('checked'); } 
+      if($('hideStatusToggle') && currentUser?.hideStatus) $('hideStatusToggle').classList.add('checked'); 
       
-      const savedTheme = localStorage.getItem("pulsar_theme") || currentUser?.theme || "aurora";
-      applyTheme(savedTheme);
-      const liquidState = localStorage.getItem("pulsar_liquid") === "1";
-      applyLiquidGlass(liquidState);
-      if (elements.liquidGlassToggle) elements.liquidGlassToggle.checked = liquidState;
+      db.ref("users").on("value", (snap) => { 
+        usersCache = snap.val() || {}; 
+        updateChatsList(); 
+        renderChats(); 
+        if (selectedPartner && usersCache[selectedPartner]) renderChatHeader(selectedPartner); 
+        updateMyProfileDisplay(); 
+      }); 
       
-      db.ref("users").on("value", (snap) => {
-        usersCache = snap.val() || {};
-        updateChatsList();
-        renderChats();
-        if (selectedPartner && usersCache[selectedPartner]) renderChatHeader(selectedPartner);
-        updateMyProfileDisplay();
-      });
-      
-      setInterval(() => {
-        if (currentUser?.uid && db) db.ref(`users/${currentUser.uid}`).update({ last_seen: Date.now() });
-      }, 30000);
-      
-      await updateChatsList();
+      setInterval(() => { if (currentUser?.uid && db) db.ref(`users/${currentUser.uid}`).update({ last_seen: Date.now() }); }, 30000); 
+      await updateChatsList(); 
+      renderChats(); 
+      loadSnowSettings(); 
+    }
+    
+    function updateMyProfileDisplay() { 
+      if (currentUser && $('myUsernameLabel')) { 
+        $('myUsernameLabel').innerText = displayUserIdentifier(currentUser); 
+        if ($('myAvatar')) $('myAvatar').src = avatarUrl(currentUser); 
+      } 
+    }
+    
+    async function updateChatsList() { 
+      if (!db || !currentUser) return; 
+      const snapshot = await db.ref("messages").get(); 
+      const allMessages = snapshot.val() || {}; 
+      const chatSet = new Set(); 
+      for (const chatIdKey in allMessages) { 
+        const messages = allMessages[chatIdKey]; 
+        for (const msgId in messages) { 
+          const msg = messages[msgId]; 
+          if (msg.senderUid === currentUser.uid) chatSet.add(msg.receiverUid); 
+          if (msg.receiverUid === currentUser.uid) chatSet.add(msg.senderUid); 
+        } 
+      } 
+      chatsList = Array.from(chatSet); 
       renderChats();
+    }
+    
+    function renderChats() { 
+      if (!$('chatList')) return; 
+      const list = chatsList.filter(uid => uid !== currentUser?.uid && usersCache[uid]); 
+      if (list.length === 0) { 
+        $('chatList').innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Нет чатов.<br>Найдите пользователя через поиск</p>'; 
+        return; 
+      } 
+      $('chatList').innerHTML = list.map(uid => { 
+        const u = usersCache[uid]; 
+        if (!u) return ''; 
+        const isActive = selectedPartner === uid; 
+        return `<div data-chat="${uid}" class="chat-item w-full text-left p-2 ${isActive ? 'chat-item-active' : ''}"><div class="flex gap-3 items-center"><img src="${avatarUrl(u)}" class="w-10 h-10 rounded-full object-cover cursor-pointer" data-profile="${uid}" /><div class="flex-1"><b>${escapeHtml(getDisplayName(u))}</b><p class="text-xs text-gray-400">${escapeHtml(displayUserIdentifier(u))}</p></div><div class="text-xs">${u.online ? '<span class="text-green-400">●</span>' : '<span class="text-gray-500">○</span>'}</div></div></div>`; 
+      }).join(""); 
       
-      if (elements.snowEnabled) {
-        const savedSnow = localStorage.getItem("pulsar_snow") === "1";
-        elements.snowEnabled.checked = savedSnow;
-        if (savedSnow) reloadSnow();
-      }
+      Array.from($('chatList').querySelectorAll("[data-chat]")).forEach(el => { 
+        el.addEventListener("click", (e) => { 
+          if (e.target.tagName === 'IMG') { 
+            const uid = e.target.getAttribute('data-profile'); 
+            if (uid) openProfile(uid); 
+          } else { 
+            const uid = el.getAttribute('data-chat');
+            if (uid) openChat(uid); 
+          } 
+        }); 
+      }); 
     }
     
-    function updateMyProfileDisplay() {
-      if (currentUser && elements.myUsernameLabel) {
-        elements.myUsernameLabel.innerText = displayUserIdentifier(currentUser);
-        if (elements.myAvatar) elements.myAvatar.src = avatarUrl(currentUser);
-      }
-    }
-    
-    async function updateChatsList() {
-      if (!db || !currentUser) return;
-      const snapshot = await db.ref("messages").get();
-      const allMessages = snapshot.val() || {};
-      const chatSet = new Set();
-      for (const chatIdKey in allMessages) {
-        const messages = allMessages[chatIdKey];
-        for (const msgId in messages) {
-          const msg = messages[msgId];
-          if (msg.senderUid === currentUser.uid) chatSet.add(msg.receiverUid);
-          if (msg.receiverUid === currentUser.uid) chatSet.add(msg.senderUid);
-        }
-      }
-      chatsList = Array.from(chatSet);
-    }
-    
-    function renderChats() {
-      if (!elements.chatList) return;
-      const list = chatsList.filter(uid => uid !== currentUser?.uid && usersCache[uid]);
-      if (list.length === 0) {
-        elements.chatList.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Нет чатов.<br>Найдите пользователя через поиск</p>';
-        return;
-      }
-      elements.chatList.innerHTML = list.map(uid => {
-        const u = usersCache[uid];
-        if (!u) return '';
-        const isActive = selectedPartner === uid;
-        return `
-          <button data-chat="${uid}" class="chat-item w-full text-left p-2 ${isActive ? 'chat-item-active' : ''}">
-            <div class="flex gap-3 items-center">
-              <img src="${avatarUrl(u)}" class="w-10 h-10 rounded-full object-cover cursor-pointer" data-profile="${uid}" />
-              <div class="flex-1">
-                <b>${escapeHtml(getDisplayName(u))}</b>
-                <p class="text-xs text-gray-400">${escapeHtml(displayUserIdentifier(u))}</p>
-              </div>
-              <div class="text-xs">${u.online ? '<span class="text-green-400">●</span>' : '<span class="text-gray-500">○</span>'}</div>
-            </div>
-          </button>
-        `;
-      }).join("");
+    async function openChat(uid) { 
+      if (!uid || uid === selectedPartner) return;
       
-      Array.from(elements.chatList.querySelectorAll("[data-chat]")).forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          if (e.target.tagName === 'IMG') {
-            const uid = e.target.getAttribute('data-profile');
-            if (uid) openProfile(uid);
-          } else {
-            openChat(btn.dataset.chat);
-          }
-        });
-      });
-    }
-    
-    async function openChat(uid) {
-      if (messageUnsub && typeof messageUnsub === 'function') messageUnsub();
-      selectedPartner = uid;
-      renderChats();
-      renderChatHeader(uid);
-      if (elements.deleteChatBtn) elements.deleteChatBtn.classList.remove("hidden");
+      if (currentMessageRef && currentMessageRef.off) {
+        currentMessageRef.off();
+      }
       
-      const cid = chatId(currentUser.uid, uid);
+      selectedPartner = uid; 
+      renderChats(); 
+      renderChatHeader(uid); 
+      if ($('deleteChatBtn')) $('deleteChatBtn').classList.remove("hidden"); 
+      
+      const cid = chatId(currentUser.uid, uid); 
       const messagesRef = db.ref(`messages/${cid}`);
-      messageUnsub = messagesRef.on("value", (snap) => {
-        const msgs = [];
-        snap.forEach(child => { msgs.push({ id: child.key, ...child.val() }); });
-        msgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-        
-        if (elements.messages) {
-          elements.messages.innerHTML = msgs.map(m => `
-            <div class="${m.senderUid === currentUser.uid ? "text-right" : "text-left"}">
-              <div class="message-bubble inline-block" style="background: ${m.senderUid === currentUser.uid ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}">
-                ${escapeHtml(m.text || "")}
-              </div>
-            </div>
-          `).join("");
-          elements.messages.scrollTop = elements.messages.scrollHeight;
-        }
-      });
+      currentMessageRef = messagesRef;
+      
+      messagesRef.off();
+      messagesRef.on("value", (snap) => { 
+        const msgs = []; 
+        snap.forEach(child => { msgs.push({ id: child.key, ...child.val() }); }); 
+        msgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)); 
+        if ($('messages')) { 
+          $('messages').innerHTML = msgs.map(m => { 
+            let content = ''; 
+            if (m.type === 'photo') { 
+              content = `<img src="${m.text}" class="photo-message" onclick="window.open('${m.text}','_blank')" />`; 
+            } else if (m.type === 'voice') { 
+              content = `<audio controls src="${m.text}"></audio>`; 
+            } else { 
+              content = escapeHtml(m.text || ""); 
+            } 
+            const isMine = m.senderUid === currentUser.uid; 
+            return `<div class="${isMine ? "text-right" : "text-left"}"><div class="message-bubble inline-block" style="background: ${isMine ? 'var(--msg-mine)' : 'var(--msg-theirs)'}">${content}</div></div>`; 
+          }).join(""); 
+          $('messages').scrollTop = $('messages').scrollHeight; 
+        } 
+      }); 
     }
     
-    function renderChatHeader(uid) {
-      const u = usersCache[uid];
-      if (!u || !elements.chatTitle) return;
-      elements.chatTitle.innerText = getDisplayName(u);
-      if (elements.chatStatus) {
-        if (u.hideStatus) elements.chatStatus.innerText = "статус скрыт";
-        else elements.chatStatus.innerText = u.online ? "🟢 онлайн" : `⚫ был(а) ${new Date(u.last_seen || Date.now()).toLocaleTimeString()}`;
-      }
+    function renderChatHeader(uid) { 
+      const u = usersCache[uid]; 
+      if (!u || !$('chatTitle')) return; 
+      $('chatTitle').innerText = getDisplayName(u); 
+      if ($('chatStatus')) { 
+        if (u.hideStatus) $('chatStatus').innerText = "статус скрыт"; 
+        else $('chatStatus').innerText = u.online ? "онлайн" : `был(а) ${new Date(u.last_seen || Date.now()).toLocaleTimeString()}`; 
+      } 
     }
     
-    // ========== ОТПРАВКА СООБЩЕНИЙ ==========
-    if (elements.messageForm) {
-      elements.messageForm.onsubmit = async (e) => {
-        e.preventDefault();
-        if (!selectedPartner || !elements.messageInput?.value.trim() || !db) return;
-        const cid = chatId(currentUser.uid, selectedPartner);
-        await db.ref(`messages/${cid}`).push({
-          senderUid: currentUser.uid,
-          receiverUid: selectedPartner,
-          text: elements.messageInput.value.trim(),
-          timestamp: Date.now()
-        });
-        elements.messageInput.value = "";
-        if (!chatsList.includes(selectedPartner)) {
-          chatsList.push(selectedPartner);
-          renderChats();
-        }
+    async function sendMessage(content, type = 'text') { 
+      if (!selectedPartner || !db) return; 
+      const cid = chatId(currentUser.uid, selectedPartner); 
+      await db.ref(`messages/${cid}`).push({ senderUid: currentUser.uid, receiverUid: selectedPartner, text: content, type: type, timestamp: Date.now() }); 
+      if (!chatsList.includes(selectedPartner)) { 
+        chatsList.push(selectedPartner); 
+        renderChats(); 
+      } 
+    }
+    
+    if ($('messageForm')) {
+      $('messageForm').onsubmit = async (e) => { 
+        e.preventDefault(); 
+        if (!selectedPartner || !$('messageInput')?.value.trim() || !db) return; 
+        await sendMessage($('messageInput').value.trim()); 
+        $('messageInput').value = ""; 
       };
     }
     
-    // ========== ПОИСК ==========
-    if (elements.searchBtn) {
-      elements.searchBtn.onclick = async () => {
-        const uname = normalizeUsername(elements.searchInput?.value || "");
-        if (!uname) { if (elements.searchResult) elements.searchResult.innerText = "Введите @username"; return; }
+    if ($('photoBtn')) $('photoBtn').onclick = () => $('photoInput').click();
+    if ($('photoInput')) {
+      $('photoInput').onchange = async (e) => { 
+        const file = e.target.files[0]; 
+        if (file && file.type.startsWith('image/')) { 
+          const reader = new FileReader(); 
+          reader.onload = async (ev) => { await sendMessage(ev.target.result, 'photo'); }; 
+          reader.readAsDataURL(file); 
+        } 
+        $('photoInput').value = ''; 
+      };
+    }
+    
+    if ($('voiceBtn')) {
+      $('voiceBtn').onmousedown = async () => { 
+        if (isRecording) return; 
+        try { 
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); 
+          mediaRecorder = new MediaRecorder(stream); 
+          audioChunks = []; 
+          mediaRecorder.ondataavailable = event => audioChunks.push(event.data); 
+          mediaRecorder.onstop = async () => { 
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); 
+            const reader = new FileReader(); 
+            reader.readAsDataURL(audioBlob); 
+            reader.onloadend = async () => { await sendMessage(reader.result, 'voice'); }; 
+            stream.getTracks().forEach(track => track.stop()); 
+          }; 
+          mediaRecorder.start(); 
+          isRecording = true; 
+          if($('recordingIndicator')) $('recordingIndicator').classList.remove('hidden'); 
+        } catch(err) { console.error("Microphone error:", err); } 
+      };
+      $('voiceBtn').onmouseup = () => { 
+        if (mediaRecorder && isRecording) { 
+          mediaRecorder.stop(); 
+          isRecording = false; 
+          if($('recordingIndicator')) $('recordingIndicator').classList.add('hidden'); 
+        } 
+      };
+      $('voiceBtn').onmouseleave = () => { 
+        if (mediaRecorder && isRecording) { 
+          mediaRecorder.stop(); 
+          isRecording = false; 
+          if($('recordingIndicator')) $('recordingIndicator').classList.add('hidden'); 
+        } 
+      };
+    }
+    
+    if ($('searchBtn')) {
+      $('searchBtn').onclick = async () => {
+        const uname = normalizeUsername($('searchInput')?.value || "");
+        if (!uname) { if ($('searchResult')) $('searchResult').innerText = "Введите @username"; return; }
         const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { if (elements.searchResult) elements.searchResult.innerText = "❌ не найден"; return; }
+        if (!snapshot.exists()) { if ($('searchResult')) $('searchResult').innerText = "❌ не найден"; return; }
         const u = Object.values(snapshot.val())[0];
-        if (u.uid === currentUser.uid) {
-          if (elements.searchResult) elements.searchResult.innerText = "❌ Нельзя начать чат с собой";
-          return;
-        }
-        if (elements.searchResult) {
-          elements.searchResult.innerHTML = `<button id="foundUserBtn" class="w-full p-2 rounded-xl bg-white/10">${escapeHtml(getDisplayName(u))} — ${escapeHtml(displayUserIdentifier(u))}</button>`;
+        if (u.uid === currentUser.uid) { if ($('searchResult')) $('searchResult').innerText = "Нельзя начать чат с собой"; return; }
+        if ($('searchResult')) {
+          $('searchResult').innerHTML = `<button id="foundUserBtn" class="w-full p-2 rounded-xl bg-white/10">${escapeHtml(getDisplayName(u))} — ${escapeHtml(displayUserIdentifier(u))}</button>`;
           document.getElementById("foundUserBtn")?.addEventListener("click", async () => {
-            if (!chatsList.includes(u.uid)) {
-              chatsList.push(u.uid);
-              renderChats();
-            }
+            if (!chatsList.includes(u.uid)) { chatsList.push(u.uid); renderChats(); }
             openChat(u.uid);
-            elements.searchInput.value = "";
-            elements.searchResult.innerHTML = "";
+            $('searchInput').value = "";
+            $('searchResult').innerHTML = "";
           });
         }
       };
     }
     
-    // ========== ПРОФИЛЬ ==========
     function openProfile(uid) {
       const u = usersCache[uid];
-      if (!u || !elements.profileModal) return;
-      elements.profileAvatar.src = avatarUrl(u);
-      elements.profileNick.innerText = getDisplayName(u);
-      elements.profileUsername.innerText = displayUserIdentifier(u);
-      
-      if (u.nftUsername && u.nftUsername.trim()) {
-        elements.profileNft.innerText = u.nftUsername;
-        elements.profileNftBlock.classList.remove("hidden");
-      } else { elements.profileNftBlock.classList.add("hidden"); }
-      
-      if (u.anonNumber && u.anonNumber.trim()) {
-        elements.profileAnon.innerText = u.anonNumber;
-        elements.profileAnonBlock.classList.remove("hidden");
-      } else { elements.profileAnonBlock.classList.add("hidden"); }
-      
-      elements.profileModal.style.display = "flex";
+      if (!u || !$('profileModal')) return;
+      $('profileAvatar').src = avatarUrl(u);
+      $('profileNick').innerText = getDisplayName(u);
+      $('profileUsername').innerText = displayUserIdentifier(u);
+      if (u.nftUsername && u.nftUsername.trim()) { $('profileNft').innerText = u.nftUsername; $('profileNftBlock').classList.remove("hidden"); } else { $('profileNftBlock').classList.add("hidden"); }
+      if (u.anonNumber && u.anonNumber.trim()) { $('profileAnon').innerText = u.anonNumber; $('profileAnonBlock').classList.remove("hidden"); } else { $('profileAnonBlock').classList.add("hidden"); }
+      $('profileModal').style.display = "flex";
     }
     
     function openMyProfile() {
-      if (!elements.editProfileModal) return;
-      elements.editNickname.value = currentUser?.nickname || "";
-      elements.editUsername.value = currentUser?.username || "";
-      elements.editAvatarPreview.src = avatarUrl(currentUser);
-      elements.editProfileModal.style.display = "flex";
+      if (!$('editProfileModal')) return;
+      $('editNickname').value = currentUser?.nickname || "";
+      $('editUsername').value = currentUser?.username || "";
+      $('editAvatarPreview').src = avatarUrl(currentUser);
+      $('editProfileModal').style.display = "flex";
     }
     
     async function saveMyProfile() {
       if (!currentUser || !db) return;
-      const newNickname = elements.editNickname?.value.trim() || "";
-      const newUsername = normalizeUsername(elements.editUsername?.value || "");
+      const newNickname = $('editNickname')?.value.trim() || "";
+      const newUsername = normalizeUsername($('editUsername')?.value || "");
       const newAvatar = localStorage.getItem("pulsar_temp_avatar") || currentUser.avatar;
-      if (!newNickname || !newUsername) { showError(elements.settingsInfo, "Заполните поля"); return; }
+      if (!newNickname || !newUsername) { showError($('settingsInfo'), "Заполните поля"); return; }
       if (newUsername !== currentUser.username) {
         const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(newUsername).get();
         if (snapshot.exists()) {
           const other = Object.values(snapshot.val())[0];
-          if (other.uid !== currentUser.uid) { showError(elements.settingsInfo, "@ уже занят"); return; }
+          if (other.uid !== currentUser.uid) { showError($('settingsInfo'), "@ уже занят"); return; }
         }
       }
       const updates = { nickname: newNickname, username: newUsername, username_lc: newUsername, avatar: newAvatar };
@@ -700,165 +869,218 @@
       localStorage.removeItem("pulsar_temp_avatar");
       updateMyProfileDisplay();
       renderChats();
-      elements.editProfileModal.style.display = "none";
-      if (elements.settingsInfo) elements.settingsInfo.innerText = "✅ Профиль обновлён";
-      setTimeout(() => { if (elements.settingsInfo) elements.settingsInfo.innerText = ""; }, 2000);
+      $('editProfileModal').style.display = "none";
+      if ($('settingsInfo')) $('settingsInfo').innerText = "Профиль обновлён";
+      setTimeout(() => { if ($('settingsInfo')) $('settingsInfo').innerText = ""; }, 2000);
     }
     
-    // ========== УДАЛЕНИЕ ЧАТА ==========
-    if (elements.deleteChatBtn) {
-      elements.deleteChatBtn.onclick = () => { if (selectedPartner) elements.deleteChatModal.style.display = "flex"; };
-    }
-    if (elements.deleteForMeBtn) {
-      elements.deleteForMeBtn.onclick = async () => {
+    if ($('deleteChatBtn')) { $('deleteChatBtn').onclick = () => { if (selectedPartner) $('deleteChatModal').style.display = "flex"; }; }
+    
+    if ($('deleteForMeBtn')) {
+      $('deleteForMeBtn').onclick = async () => {
         if (!selectedPartner || !db) return;
         const cid = chatId(currentUser.uid, selectedPartner);
         await db.ref(`messages/${cid}`).remove();
         const index = chatsList.indexOf(selectedPartner);
         if (index !== -1) chatsList.splice(index, 1);
+        if (currentMessageRef && currentMessageRef.off) {
+          currentMessageRef.off();
+          currentMessageRef = null;
+        }
         renderChats();
-        elements.messages.innerHTML = "";
+        if ($('messages')) $('messages').innerHTML = "";
         selectedPartner = null;
-        elements.chatTitle.innerText = "Нет диалога";
-        elements.chatStatus.innerText = "";
-        elements.deleteChatBtn.classList.add("hidden");
-        elements.deleteChatModal.style.display = "none";
+        if ($('chatTitle')) $('chatTitle').innerText = "Нет диалога";
+        if ($('chatStatus')) $('chatStatus').innerText = "";
+        if ($('deleteChatBtn')) $('deleteChatBtn').classList.add("hidden");
+        $('deleteChatModal').style.display = "none";
       };
     }
-    if (elements.deleteForBothBtn) {
-      elements.deleteForBothBtn.onclick = async () => {
+    
+    if ($('deleteForBothBtn')) {
+      $('deleteForBothBtn').onclick = async () => {
         if (!selectedPartner || !db) return;
         const cid = chatId(currentUser.uid, selectedPartner);
         await db.ref(`messages/${cid}`).remove();
         const index = chatsList.indexOf(selectedPartner);
         if (index !== -1) chatsList.splice(index, 1);
+        if (currentMessageRef && currentMessageRef.off) {
+          currentMessageRef.off();
+          currentMessageRef = null;
+        }
         renderChats();
-        elements.messages.innerHTML = "";
+        if ($('messages')) $('messages').innerHTML = "";
         selectedPartner = null;
-        elements.chatTitle.innerText = "Нет диалога";
-        elements.chatStatus.innerText = "";
-        elements.deleteChatBtn.classList.add("hidden");
-        elements.deleteChatModal.style.display = "none";
+        if ($('chatTitle')) $('chatTitle').innerText = "Нет диалога";
+        if ($('chatStatus')) $('chatStatus').innerText = "";
+        if ($('deleteChatBtn')) $('deleteChatBtn').classList.add("hidden");
+        $('deleteChatModal').style.display = "none";
       };
     }
-    if (elements.cancelDeleteBtn) {
-      elements.cancelDeleteBtn.onclick = () => { elements.deleteChatModal.style.display = "none"; };
-    }
     
-    // ========== НАСТРОЙКИ ==========
-    if (elements.saveSettingsBtn) {
-      elements.saveSettingsBtn.onclick = async () => {
+    if ($('cancelDeleteBtn')) { $('cancelDeleteBtn').onclick = () => { $('deleteChatModal').style.display = "none"; }; }
+    
+    if ($('saveSettingsBtn')) {
+      $('saveSettingsBtn').onclick = async () => {
         if (!currentUser || !db) return;
-        const updates = {
-          hideStatus: !!elements.hideStatusInput?.checked,
-          theme: elements.themeSelect?.value || "aurora"
-        };
+        const selectedTheme = $('selectedThemeText')?.innerText === "GreenBlack" ? "greenblack" : "default";
+        const updates = { hideStatus: getCheckboxValue($('hideStatusToggle')), theme: selectedTheme };
         await db.ref(`users/${currentUser.uid}`).update(updates);
         currentUser = { ...currentUser, ...updates };
-        applyTheme(updates.theme);
-        applyLiquidGlass(!!elements.liquidGlassToggle?.checked);
-        localStorage.setItem("pulsar_snow", elements.snowEnabled?.checked ? "1" : "0");
+        applyTheme(selectedTheme);
+        applyLiquidGlass(getCheckboxValue($('liquidGlassToggle')));
+        saveSnowSettings();
         reloadSnow();
-        if (elements.settingsInfo) elements.settingsInfo.innerText = "✅ Сохранено!";
-        setTimeout(() => { if (elements.settingsInfo) elements.settingsInfo.innerText = ""; }, 2000);
+        if ($('settingsInfo')) $('settingsInfo').innerText = "Сохранено";
+        setTimeout(() => { if ($('settingsInfo')) $('settingsInfo').innerText = ""; }, 2000);
       };
     }
     
-    // ========== АДМИНКА ==========
-    if (elements.adminTrigger) {
-      elements.adminTrigger.onclick = () => {
-        adminClicks++;
-        if (adminClicks >= 5) { adminClicks = 0; elements.adminModal.style.display = "flex"; }
+    if ($('logoutSettingsBtn')) {
+      $('logoutSettingsBtn').onclick = () => {
+        $('settingsModal').style.display = "none";
+        $('confirmLogoutModal').style.display = "flex";
       };
-    }
-    if (elements.grantNftBtn) {
-      elements.grantNftBtn.onclick = async () => {
-        const uname = normalizeUsername(elements.adminUsername?.value || "");
-        const nftName = normalizeUsername(elements.nftUsernameInput?.value || "");
-        if (!nftName) { if (elements.adminInfo) elements.adminInfo.innerText = "Введите NFT @username"; return; }
-        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { if (elements.adminInfo) elements.adminInfo.innerText = "❌ Не найден"; return; }
-        const uid = Object.keys(snapshot.val())[0];
-        await db.ref(`users/${uid}`).update({ nftUsername: nftName });
-        if (elements.adminInfo) elements.adminInfo.innerText = `✅ Выдан: ${nftName}`;
-      };
-    }
-    if (elements.setManualAnonBtn) {
-      elements.setManualAnonBtn.onclick = async () => {
-        const uname = normalizeUsername(elements.adminUsername?.value || "");
-        const num = elements.manualAnonNumber?.value.trim() || "";
-        if (!num.startsWith("+888")) { if (elements.adminInfo) elements.adminInfo.innerText = "Номер должен начинаться с +888"; return; }
-        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { if (elements.adminInfo) elements.adminInfo.innerText = "❌ Не найден"; return; }
-        const uid = Object.keys(snapshot.val())[0];
-        await db.ref(`users/${uid}`).update({ anonNumber: num });
-        if (elements.adminInfo) elements.adminInfo.innerText = `✅ Номер: ${num}`;
-      };
-    }
-    if (elements.closeAdmin) {
-      elements.closeAdmin.onclick = () => { elements.adminModal.style.display = "none"; };
     }
     
-    // ========== ВЫХОД ==========
-    if (elements.logoutBtn) {
-      elements.logoutBtn.onclick = async () => {
+    if ($('confirmLogoutBtn')) {
+      $('confirmLogoutBtn').onclick = async () => {
         if (currentUser?.uid && db) await db.ref(`users/${currentUser.uid}`).update({ online: false, last_seen: Date.now() });
         localStorage.removeItem("pulsar_uid");
         location.reload();
       };
     }
     
-    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
-    if (elements.loginTab) {
-      elements.loginTab.onclick = () => {
-        elements.loginForm.classList.remove("hidden");
-        elements.registerForm.classList.add("hidden");
-        elements.loginTab.classList.add("bg-white/10");
-        elements.registerTab.classList.remove("bg-white/10");
-      };
-    }
-    if (elements.registerTab) {
-      elements.registerTab.onclick = () => {
-        elements.registerForm.classList.remove("hidden");
-        elements.loginForm.classList.add("hidden");
-        elements.registerTab.classList.add("bg-white/10");
-        elements.loginTab.classList.remove("bg-white/10");
-      };
+    if ($('cancelLogoutBtn')) { $('cancelLogoutBtn').onclick = () => { $('confirmLogoutModal').style.display = "none"; }; }
+    
+    if ($('adminTrigger')) {
+      $('adminTrigger').onclick = () => { adminClicks++; if (adminClicks >= 5) { adminClicks = 0; $('adminModal').style.display = "flex"; } };
     }
     
-    // ========== МОДАЛКИ ==========
-    if (elements.openSettings) {
-      elements.openSettings.onclick = () => {
-        if (elements.hideStatusInput) elements.hideStatusInput.checked = currentUser?.hideStatus || false;
-        if (elements.themeSelect) elements.themeSelect.value = currentUser?.theme || "aurora";
-        if (elements.liquidGlassToggle) elements.liquidGlassToggle.checked = localStorage.getItem("pulsar_liquid") === "1";
-        if (elements.snowEnabled) elements.snowEnabled.checked = localStorage.getItem("pulsar_snow") === "1";
-        elements.settingsModal.style.display = "flex";
-      };
-    }
-    if (elements.closeSettings) elements.closeSettings.onclick = () => { elements.settingsModal.style.display = "none"; };
-    if (elements.closeProfile) elements.closeProfile.onclick = () => { elements.profileModal.style.display = "none"; };
-    if (elements.closeEditProfile) elements.closeEditProfile.onclick = () => { elements.editProfileModal.style.display = "none"; };
-    if (elements.saveProfileBtn) elements.saveProfileBtn.onclick = saveMyProfile;
-    if (elements.myProfileBtn) elements.myProfileBtn.onclick = openMyProfile;
-    
-    // ========== СНЕГОПАД НАСТРОЙКИ ==========
-    if (elements.snowEnabled) elements.snowEnabled.onchange = reloadSnow;
-    if (elements.snowCount) elements.snowCount.oninput = () => { elements.snowCountVal.innerText = elements.snowCount.value; reloadSnow(); };
-    if (elements.snowSize) elements.snowSize.oninput = () => { elements.snowSizeVal.innerText = elements.snowSize.value; reloadSnow(); };
-    if (elements.snowSpeed) elements.snowSpeed.oninput = () => { elements.snowSpeedVal.innerText = elements.snowSpeed.value; reloadSnow(); };
-    
-    // ========== ДИАГНОСТИКА ==========
-    if (elements.diagnosticBtn) {
-      elements.diagnosticBtn.onclick = () => {
-        alert(`🔍 Pulsar Диагностика\n\n✅ Firebase: ${db ? "Подключён" : "НЕ подключён"}\n✅ Пользователь: ${currentUser ? currentUser.nickname : "нет"}\n📋 Чатов: ${chatsList.length}\n🌐 Браузер: ${navigator.userAgent.split(' ').slice(-2).join(' ')}\n📱 Экран: ${window.innerWidth}x${window.innerHeight}`);
+    if ($('grantNftBtn')) {
+      $('grantNftBtn').onclick = async () => {
+        const uname = normalizeUsername($('adminUsername')?.value || "");
+        const nftName = normalizeUsername($('nftUsernameInput')?.value || "");
+        if (!nftName) { if ($('adminInfo')) $('adminInfo').innerText = "Введите NFT @username"; return; }
+        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
+        if (!snapshot.exists()) { if ($('adminInfo')) $('adminInfo').innerText = "Пользователь не найден"; return; }
+        const uid = Object.keys(snapshot.val())[0];
+        await db.ref(`users/${uid}`).update({ nftUsername: nftName });
+        if ($('adminInfo')) $('adminInfo').innerText = `Выдан NFT: ${nftName}`;
       };
     }
     
-    // ========== АВТОВХОД ==========
+    if ($('setManualAnonBtn')) {
+      $('setManualAnonBtn').onclick = async () => {
+        const uname = normalizeUsername($('adminUsername')?.value || "");
+        const num = $('manualAnonNumber')?.value.trim() || "";
+        if (!num.startsWith("+888")) { if ($('adminInfo')) $('adminInfo').innerText = "Номер должен начинаться с +888"; return; }
+        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
+        if (!snapshot.exists()) { if ($('adminInfo')) $('adminInfo').innerText = "Пользователь не найден"; return; }
+        const uid = Object.keys(snapshot.val())[0];
+        await db.ref(`users/${uid}`).update({ anonNumber: num });
+        if ($('adminInfo')) $('adminInfo').innerText = `Номер: ${num}`;
+      };
+    }
+    
+    if ($('closeAdmin')) { $('closeAdmin').onclick = () => { $('adminModal').style.display = "none"; }; }
+    
+    if ($('loginTab')) {
+      $('loginTab').onclick = () => {
+        $('loginForm').classList.remove("hidden");
+        $('registerForm').classList.add("hidden");
+        $('loginTab').classList.add("bg-white/5");
+        $('registerTab').classList.remove("bg-white/5");
+      };
+    }
+    
+    if ($('registerTab')) {
+      $('registerTab').onclick = () => {
+        $('registerForm').classList.remove("hidden");
+        $('loginForm').classList.add("hidden");
+        $('registerTab').classList.add("bg-white/5");
+        $('loginTab').classList.remove("bg-white/5");
+      };
+    }
+    
+    if ($('openSettings')) {
+      $('openSettings').onclick = () => {
+        const savedTheme = localStorage.getItem("pulsar_theme") || currentUser?.theme || "default";
+        if ($('selectedThemeText')) $('selectedThemeText').textContent = savedTheme === "default" ? "Default" : "GreenBlack";
+        if ($('liquidGlassToggle')) {
+          const liquidState = localStorage.getItem("pulsar_liquid") === "1";
+          if(liquidState) $('liquidGlassToggle').classList.add('checked'); else $('liquidGlassToggle').classList.remove('checked');
+        }
+        if ($('hideStatusToggle')) {
+          if(currentUser?.hideStatus) $('hideStatusToggle').classList.add('checked'); else $('hideStatusToggle').classList.remove('checked');
+        }
+        loadSnowSettings();
+        $('settingsModal').style.display = "flex";
+      };
+    }
+    
+    if ($('closeSettings')) { 
+      $('closeSettings').onclick = () => {
+        $('settingsModal').style.display = "none";
+      };
+    }
+    
+    if ($('closeProfile')) { 
+      $('closeProfile').onclick = () => { $('profileModal').style.display = "none"; };
+    }
+    
+    if ($('closeEditProfile')) { 
+      $('closeEditProfile').onclick = () => { $('editProfileModal').style.display = "none"; };
+    }
+    
+    if ($('saveProfileBtn')) $('saveProfileBtn').onclick = saveMyProfile;
+    if ($('myProfileBtn')) $('myProfileBtn').onclick = openMyProfile;
+    
+    if ($('snowToggle')) $('snowToggle').addEventListener('click', () => { saveSnowSettings(); reloadSnow(); });
+    if ($('snowCount')) $('snowCount').oninput = () => { if ($('snowCountVal')) $('snowCountVal').innerText = $('snowCount').value; saveSnowSettings(); reloadSnow(); };
+    if ($('snowSize')) $('snowSize').oninput = () => { if ($('snowSizeVal')) $('snowSizeVal').innerText = $('snowSize').value; saveSnowSettings(); reloadSnow(); };
+    if ($('snowSpeed')) $('snowSpeed').oninput = () => { if ($('snowSpeedVal')) $('snowSpeedVal').innerText = $('snowSpeed').value; saveSnowSettings(); reloadSnow(); };
+    
+    function initCustomSelect() {
+      const trigger = $('themeSelectTrigger');
+      const dropdown = $('themeSelectDropdown');
+      if (!trigger || !dropdown) return;
+      trigger.addEventListener('click', () => {
+        dropdown.classList.toggle('open');
+      });
+      document.querySelectorAll('.select-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          const value = opt.getAttribute('data-value');
+          const text = opt.textContent;
+          if ($('selectedThemeText')) $('selectedThemeText').textContent = text;
+          dropdown.classList.remove('open');
+          applyTheme(value);
+        });
+      });
+      document.addEventListener('click', (e) => {
+        if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.remove('open');
+        }
+      });
+    }
+    
+    function initCustomCheckbox(container, initialValue) {
+      if (!container) return;
+      if (initialValue) container.classList.add('checked');
+      container.addEventListener('click', (e) => {
+        e.stopPropagation();
+        container.classList.toggle('checked');
+      });
+    }
+    
+    initCustomSelect();
+    initCustomCheckbox($('liquidGlassToggle'), localStorage.getItem("pulsar_liquid") === "1");
+    initCustomCheckbox($('hideStatusToggle'), false);
+    initCustomCheckbox($('snowToggle'), false);
+    
     (async function autoLogin() {
-      if (elements.loginForm) elements.loginForm.onsubmit = loginUser;
-      if (elements.registerForm) elements.registerForm.onsubmit = registerUser;
+      if ($('loginForm')) $('loginForm').onsubmit = loginUser;
+      if ($('registerForm')) $('registerForm').onsubmit = registerUser;
       const uid = localStorage.getItem("pulsar_uid");
       if (uid && db) {
         const snap = await db.ref(`users/${uid}`).get();
