@@ -109,14 +109,13 @@
     .snow-flake {
       position: fixed;
       pointer-events: none;
-      background: white;
+      background: white !important;
       border-radius: 50%;
-      opacity: 0.35;
+      opacity: 0.6;
       z-index: 9999;
-      animation: fall linear forwards;
     }
     @keyframes fall {
-      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.35; }
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.6; }
       100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
 
@@ -142,16 +141,46 @@
       box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
     }
     
-    audio {
-      height: 40px;
-      border-radius: 20px;
-      background: rgba(0,0,0,0.3);
+    /* Кастомный аудиоплеер */
+    .custom-audio {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,0.5);
+      padding: 6px 12px;
+      border-radius: 32px;
+      min-width: 160px;
     }
-    img.photo-message {
-      max-width: 200px;
-      max-height: 200px;
-      border-radius: 16px;
+    .audio-play-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
       cursor: pointer;
+    }
+    .audio-wave {
+      flex: 1;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .audio-wave span {
+      width: 3px;
+      background: var(--accent-glow);
+      border-radius: 2px;
+      transition: height 0.05s linear;
+    }
+    .audio-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 40px;
+      font-family: monospace;
     }
 
     .custom-checkbox {
@@ -394,30 +423,20 @@
       </div>
     </div>
 
-    <!-- Мобильный вид -->
+    <!-- Мобильный вид (без поиска сверху) -->
     <div class="mobile-view" style="display: none; height: 100%; flex-direction: column;">
       <div class="glass-card" style="flex: 1; margin: 12px; display: flex; flex-direction: column; overflow: hidden;">
-        <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <img id="mobileMyAvatar" class="w-10 h-10 rounded-full object-cover border-2" style="border-color: var(--accent);" src="" />
-            <div>
-              <h2 class="text-lg font-bold pulsar-title">Pulsar</h2>
-              <p id="mobileMyUsernameLabel" class="text-xs text-gray-400"></p>
-            </div>
+        <div class="px-4 py-3 border-b border-white/10 flex items-center gap-3">
+          <img id="mobileMyAvatar" class="w-10 h-10 rounded-full object-cover border-2" style="border-color: var(--accent);" src="" />
+          <div>
+            <h2 class="text-lg font-bold pulsar-title">Pulsar</h2>
+            <p id="mobileMyUsernameLabel" class="text-xs text-gray-400"></p>
           </div>
-        </div>
-        
-        <div class="p-3">
-          <div class="flex gap-2">
-            <input id="mobileSearchInput" placeholder="Поиск @username" class="flex-1" />
-            <button id="mobileSearchBtn" class="px-4 rounded-full bg-white/10">🔍</button>
-          </div>
-          <div id="mobileSearchResult" class="text-sm mt-2"></div>
         </div>
         
         <div class="px-3">
           <p class="text-xs text-gray-400 mb-2">ЧАТЫ</p>
-          <div id="mobileChatList" class="flex-1 overflow-y-auto space-y-1" style="max-height: 40vh;"></div>
+          <div id="mobileChatList" class="flex-1 overflow-y-auto space-y-1" style="max-height: 70vh;"></div>
         </div>
         
         <div class="flex-1 flex flex-col min-h-0" style="margin-top: auto;">
@@ -443,7 +462,6 @@
     <!-- Нижняя навигация -->
     <div class="mobile-nav">
       <button id="navChatsBtn" class="active">💬</button>
-      <button id="navSearchBtn">🔍</button>
       <button id="navProfileBtn">👤</button>
       <button id="navSettingsBtn">⚙️</button>
     </div>
@@ -619,7 +637,7 @@
         flake.style.height = sz + "px"; 
         flake.style.left = Math.random() * 100 + "%"; 
         const duration = speedSec + Math.random() * 5; 
-        flake.style.animationDuration = duration + "s"; 
+        flake.style.animation = `fall ${duration}s linear forwards`; 
         container.appendChild(flake); 
         setTimeout(() => flake.remove(), duration * 1000); 
       }
@@ -813,6 +831,59 @@
       });
     }
     
+    function initAudioPlayer(container) {
+      const btn = container.querySelector('.audio-play-btn');
+      const waves = container.querySelectorAll('.audio-wave span');
+      const timeSpan = container.querySelector('.audio-time');
+      const audioSrc = container.getAttribute('data-audio');
+      let audio = null;
+      let isPlaying = false;
+      let interval = null;
+      
+      if (!btn) return;
+      
+      btn.onclick = () => {
+        if (audio && !audio.paused) {
+          if (interval) clearInterval(interval);
+          audio.pause();
+          audio.currentTime = 0;
+          btn.textContent = '▶';
+          isPlaying = false;
+          waves.forEach(w => w.style.height = '4px');
+          timeSpan.textContent = '0:00';
+          audio = null;
+          return;
+        }
+        if (audio) {
+          if (interval) clearInterval(interval);
+          audio.pause();
+        }
+        audio = new Audio(audioSrc);
+        audio.onplay = () => {
+          isPlaying = true;
+          btn.textContent = '⏸';
+          interval = setInterval(() => {
+            if (audio.paused || audio.ended) {
+              clearInterval(interval);
+              btn.textContent = '▶';
+              isPlaying = false;
+              waves.forEach(w => w.style.height = '4px');
+              timeSpan.textContent = '0:00';
+              return;
+            }
+            waves.forEach((w, i) => {
+              const h = 4 + Math.sin(Date.now() / 200 + i) * 8;
+              w.style.height = isPlaying ? `${h}px` : '4px';
+            });
+            const mins = Math.floor(audio.currentTime / 60);
+            const secs = Math.floor(audio.currentTime % 60);
+            timeSpan.textContent = `${mins}:${secs < 10 ? '0' + secs : secs}`;
+          }, 100);
+        };
+        audio.play();
+      };
+    }
+    
     async function openChat(uid) { 
       if (!uid || uid === selectedPartner) return;
       
@@ -836,21 +907,30 @@
         const msgs = []; 
         snap.forEach(child => { msgs.push({ id: child.key, ...child.val() }); }); 
         msgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)); 
-        if ($('messages')) { 
-          $('messages').innerHTML = msgs.map(m => { 
+        
+        function renderMessagesContainer(containerId) {
+          const container = $(containerId);
+          if (!container) return;
+          container.innerHTML = msgs.map(m => { 
             let content = ''; 
             if (m.type === 'photo') { 
-              content = `<img src="${m.text}" class="photo-message" onclick="window.open('${m.text}','_blank')" />`; 
+              content = `<img src="${m.text}" class="photo-message max-w-[200px] max-h-[200px] rounded-2xl cursor-pointer" onclick="window.open('${m.text}','_blank')" />`; 
             } else if (m.type === 'voice') { 
-              content = `<audio controls src="${m.text}"></audio>`; 
+              content = `<div class="custom-audio" data-audio="${m.text}"><button class="audio-play-btn">▶</button><div class="audio-wave"><span></span><span></span><span></span><span></span><span></span></div><span class="audio-time">0:00</span></div>`; 
             } else { 
               content = escapeHtml(m.text || ""); 
             } 
             const isMine = m.senderUid === currentUser.uid; 
             return `<div class="${isMine ? "text-right" : "text-left"}"><div class="message-bubble inline-block" style="background: ${isMine ? 'var(--msg-mine)' : 'var(--msg-theirs)'}">${content}</div></div>`; 
           }).join(""); 
-          $('messages').scrollTop = $('messages').scrollHeight; 
-        } 
+          container.scrollTop = container.scrollHeight;
+          setTimeout(() => {
+            container.querySelectorAll('.custom-audio').forEach(initAudioPlayer);
+          }, 100);
+        }
+        
+        renderMessagesContainer('messages');
+        renderMessagesContainer('mobileMessages');
       }); 
     }
     
@@ -1008,7 +1088,7 @@
       };
     }
     
-    // Поиск
+    // Поиск (только на десктопе)
     if ($('searchBtn')) {
       $('searchBtn').onclick = async () => {
         const uname = normalizeUsername($('searchInput')?.value || "");
@@ -1024,27 +1104,6 @@
             openChat(u.uid);
             $('searchInput').value = "";
             $('searchResult').innerHTML = "";
-          });
-        }
-      };
-    }
-    
-    if ($('mobileSearchBtn')) {
-      $('mobileSearchBtn').onclick = async () => {
-        const uname = normalizeUsername($('mobileSearchInput')?.value || "");
-        if (!uname) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "Введите @username"; return; }
-        const snapshot = await db.ref("users").orderByChild("username_lc").equalTo(uname).get();
-        if (!snapshot.exists()) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "❌ не найден"; return; }
-        const u = Object.values(snapshot.val())[0];
-        if (u.uid === currentUser.uid) { if ($('mobileSearchResult')) $('mobileSearchResult').innerText = "Нельзя начать чат с собой"; return; }
-        if ($('mobileSearchResult')) {
-          $('mobileSearchResult').innerHTML = `<button id="mobileFoundUserBtn" class="w-full p-2 rounded-xl bg-white/10">${escapeHtml(getDisplayName(u))} — ${escapeHtml(displayUserIdentifier(u))}</button>`;
-          document.getElementById("mobileFoundUserBtn")?.addEventListener("click", async () => {
-            if (!chatsList.includes(u.uid)) { chatsList.push(u.uid); renderChats(); renderMobileChats(); }
-            openChat(u.uid);
-            $('mobileSearchInput').value = "";
-            $('mobileSearchResult').innerHTML = "";
-            document.querySelector('#navChatsBtn')?.click();
           });
         }
       };
@@ -1300,47 +1359,31 @@
     
     function initMobileNav() {
       const navChats = $('#navChatsBtn');
-      const navSearch = $('#navSearchBtn');
       const navProfile = $('#navProfileBtn');
       const navSettings = $('#navSettingsBtn');
       
-      const mobileViews = {
-        chats: () => {
-          document.querySelectorAll('.mobile-view > div > div:not(:first-child)').forEach(el => {
-            if (el.id !== 'mobileChatList' && el.id !== 'mobileMessages' && el.parentElement) {
-              if (el.id === 'mobileMessages') el.style.display = 'flex';
-              else if (el.classList.contains('flex-1')) el.style.display = 'flex';
-            }
-          });
-          if ($('mobileMessages')) $('mobileMessages').style.display = 'block';
-        },
-        search: () => {
-          if ($('mobileSearchResult')) $('mobileSearchResult').scrollIntoView({ behavior: 'smooth' });
-        },
-        profile: () => openMyProfile(),
-        settings: () => $('openSettings').click()
-      };
-      
-      navChats?.addEventListener('click', () => {
-        [navChats, navSearch, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
-        navChats.classList.add('active');
-        mobileViews.chats();
-      });
-      navSearch?.addEventListener('click', () => {
-        [navChats, navSearch, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
-        navSearch.classList.add('active');
-        mobileViews.search();
-      });
-      navProfile?.addEventListener('click', () => {
-        [navChats, navSearch, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
-        navProfile.classList.add('active');
-        mobileViews.profile();
-      });
-      navSettings?.addEventListener('click', () => {
-        [navChats, navSearch, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
-        navSettings.classList.add('active');
-        mobileViews.settings();
-      });
+      if (navChats) {
+        navChats.onclick = () => {
+          [navChats, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
+          navChats.classList.add('active');
+          if ($('mobileChatsView')) $('mobileChatsView').style.display = 'flex';
+          if ($('mobileMessagesView')) $('mobileMessagesView').style.display = 'none';
+        };
+      }
+      if (navProfile) {
+        navProfile.onclick = () => {
+          [navChats, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
+          navProfile.classList.add('active');
+          openMyProfile();
+        };
+      }
+      if (navSettings) {
+        navSettings.onclick = () => {
+          [navChats, navProfile, navSettings].forEach(btn => btn?.classList.remove('active'));
+          navSettings.classList.add('active');
+          if ($('openSettings')) $('openSettings').click();
+        };
+      }
     }
     
     function checkMobileView() {
